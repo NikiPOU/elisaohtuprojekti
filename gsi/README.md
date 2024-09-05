@@ -1,0 +1,2 @@
+1. Place the gamestate_integration_example.cfg file in your game folder: steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg
+2. Start any http server and listen to POST messages on the uri you placed in the cfg file
