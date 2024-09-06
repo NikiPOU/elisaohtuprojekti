@@ -1,0 +1,87 @@
+{
+    "map": {
+        "mode": "competitive",
+        "name": "de_ancient",
+        "num_matches_to_win_series": 0,
+        "phase": "live",
+        "round": 11,
+        "round_wins": {
+            "1": "ct_win_defuse",
+            "10": "ct_win_elimination",
+            "11": "t_win_bomb",
+            "2": "t_win_bomb",
+            "3": "t_win_elimination",
+            "4": "ct_win_defuse",
+            "5": "t_win_bomb",
+            "6": "t_win_bomb",
+            "7": "t_win_bomb",
+            "8": "t_win_bomb",
+            "9": "t_win_bomb"
+        },
+        "team_ct": {
+            "consecutive_round_losses": 4,
+            "matches_won_this_series": 0,
+            "score": 3,
+            "timeouts_remaining": 1
+        },
+        "team_t": {
+            "consecutive_round_losses": 0,
+            "matches_won_this_series": 0,
+            "score": 8,
+            "timeouts_remaining": 1
+        }
+    },
+    "player": {
+        "activity": "playing",
+        "match_stats": {
+            "assists": 2,
+            "deaths": 7,
+            "kills": 17,
+            "mvps": 2,
+            "score": 40
+        },
+        "name": "cs2 bad",
+        "observer_slot": 0,
+        "state": {
+            "armor": 0,
+            "burning": 0,
+            "equip_value": 200,
+            "flashed": 0,
+            "health": 100,
+            "helmet": false,
+            "money": 16000,
+            "round_killhs": 0,
+            "round_kills": 0,
+            "smoked": 0
+        },
+        "steamid": "76561198194694750",
+        "team": "CT",
+        "weapons": {
+            "weapon_0": {
+                "name": "weapon_knife",
+                "paintkit": "default",
+                "state": "holstered",
+                "type": "Knife"
+            },
+            "weapon_1": {
+                "ammo_clip": 13,
+                "ammo_clip_max": 13,
+                "ammo_reserve": 52,
+                "name": "weapon_hkp2000",
+                "paintkit": "default",
+                "state": "active",
+                "type": "Pistol"
+            }
+        }
+    },
+    "provider": {
+        "appid": 730,
+        "name": "Counter-Strike: Global Offensive",
+        "steamid": "76561198194694750",
+        "timestamp": 1725483082,
+        "version": 14030
+    },
+    "round": {
+        "phase": "live"
+    }
+}
