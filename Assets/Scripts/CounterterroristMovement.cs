@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Terrorist1Movement : MonoBehaviour
+public class CounterterroristMovement : MonoBehaviour
 {
     public float speed = 0.2f;
     Vector3 targetPosition = new Vector3(-0.8f, 0.501f, 0.2f);
