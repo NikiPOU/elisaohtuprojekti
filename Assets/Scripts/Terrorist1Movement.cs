@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Terrorist1Movement : MonoBehaviour
 {
-    public float speed = 1;
+    public float speed = 0.2f;
     Vector3 targetPosition = new Vector3(-0.8f, 0.501f, 0.2f);
 
     // Start is called before the first frame update
