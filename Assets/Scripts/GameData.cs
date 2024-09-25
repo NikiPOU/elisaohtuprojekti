@@ -7,25 +7,29 @@ using TMPro;
 public class Statistics : MonoBehaviour
 {
 
-    public TMP_Text text;
-
+    public TMP_Text text; //textMeshPro komponentti!
+    public GSIDataReceiver gsiDataReceiver; //GSIDataReceiver scriptistä komponentti
     void Start()
     {
-        if (text != null)
+        if (text == null)
         {
 
-            text.text = "Game statistics here";
-            Debug.Log("Teksti on päivitetty"); // Log success message
+            //text.text = "Game statistics here"; VANHA
+            Debug.Log("Teksti komponentissa ongelma"); 
         }
-        else
+        if (gsiDataReceiver == null)
         {
-            Debug.LogError("Ei toimi: Teksti-komponentti puuttuu.");
+            Debug.LogError("Ei toimi: GSI datan haussa ongelma.");
         }
     }
 
 
     void Update()
     {
-        
+        if (gsiDataReceiver != null && text != null)
+        {
+            text.text = "toimii" //gsiDataReceiver.gsiData //päivittää serveriltä saatua dataa näytölle
+        }
+
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine.Networking;
 
 public class GSIDataReceiver : MonoBehaviour
 {
+    public string gsiData; //UUTTA tähän muuttujaan talletetaan gsi dataa
     private void Start()
     {
         StartCoroutine(GetGSIData("http://localhost:3000/data"));   // Kovakoodattuna portti 3000 väliaikaisesti
@@ -25,6 +26,7 @@ public class GSIDataReceiver : MonoBehaviour
                 }
                 else
                 {
+                    gsiData = webRequest.downloadHandler.text; //gsiData muuttujaan talletetaan haettu data
                     // Printtaa GSI Datan Unity terminaaliin
                     Debug.Log("GSI Data: " + webRequest.downloadHandler.text);
                 }
