@@ -29,7 +29,7 @@ public class Statistics : MonoBehaviour
         if (gsiDataReceiver != null && text != null)
         {
             //tässä eritellään tärkeä data turhasta
-            string important = ParseGSI(gsidataReceiver.gsiData);
+            string important = ParseGSI(gsiDataReceiver.gsiData);
 
             text.text = important; //päivittää serveriltä saatua dataa näytölle
         }
