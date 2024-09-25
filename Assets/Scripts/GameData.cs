@@ -13,22 +13,21 @@ public class Statistics : MonoBehaviour
     {
         if (text == null)
         {
-
-            //text.text = "Game statistics here"; VANHA
             Debug.Log("Teksti komponentissa ongelma"); 
         }
+        
+        gsiDataReceiver = FindObjectOfType<GSIDataReceiver>();
         if (gsiDataReceiver == null)
         {
             Debug.LogError("Ei toimi: GSI datan haussa ongelma.");
         }
     }
 
-
     void Update()
     {
         if (gsiDataReceiver != null && text != null)
         {
-            text.text = "toimii" //gsiDataReceiver.gsiData //päivittää serveriltä saatua dataa näytölle
+            text.text = gsiDataReceiver.gsiData; //päivittää serveriltä saatua dataa näytölle
         }
 
     }
