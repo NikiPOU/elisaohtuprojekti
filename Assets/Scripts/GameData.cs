@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Newtonsoft.Json.Linq;
 
 
 public class Statistics : MonoBehaviour
@@ -27,8 +28,23 @@ public class Statistics : MonoBehaviour
     {
         if (gsiDataReceiver != null && text != null)
         {
-            text.text = gsiDataReceiver.gsiData; //päivittää serveriltä saatua dataa näytölle
+            //tässä eritellään tärkeä data turhasta
+            string important = ParseGSI(gsidataReceiver.gsiData);
+
+            text.text = important; //päivittää serveriltä saatua dataa näytölle
         }
 
     }
+    string ParseGSI(string jsonData)
+    {
+
+        JObject data = JObject.Parse(jsonData); //parse newtonsoftilla
+        string playerName = data["player"]?["name"]?.ToString();
+        string handledData = $"Player: {playerName}\n";
+
+        return handledData;
+    }
+
+
+
 }
