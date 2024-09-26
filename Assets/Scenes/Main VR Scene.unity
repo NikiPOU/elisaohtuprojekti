@@ -1515,6 +1515,7 @@ GameObject:
   - component: {fileID: 216528933}
   - component: {fileID: 216528934}
   - component: {fileID: 216528935}
+  - component: {fileID: 216528936}
   m_Layer: 0
   m_Name: XR Origin
   m_TagString: Untagged
@@ -1625,6 +1626,19 @@ MonoBehaviour:
   m_MotionControllerModeEnded:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &216528936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 216528929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e0d5da6b56c0c34e9d253d6c10963d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gsiData: 
 --- !u!1001 &240387795
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3408,6 +3422,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: {fileID: 1113673142}
+  gsiDataReceiver: {fileID: 0}
 --- !u!1 &567174308 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6041701724466537169, guid: 5f0e85136acd48df1a083e13446788ac,
