@@ -55,9 +55,9 @@ public class Statistics : MonoBehaviour
             int assists = player.First["match_stats"]?["assists"]?.ToObject<int>() ?? 0;
             int deaths = player.First["match_stats"]?["deaths"]?.ToObject<int>() ?? 0;
 
-            string handledData = $"Player: {playerName}\n" +
-                                $"Team: {team}\n" +
-                                $"Health: {health}\n" +
+            string handledData = $"Player: {playerName} | " +
+                                $"Team: {team} | " +
+                                $"Health: {health} | " +
                                 $"Kills: {kills} | Assists: {assists} | Deaths: {deaths}\n";
             playerDetails.Add(handledData);
     }
