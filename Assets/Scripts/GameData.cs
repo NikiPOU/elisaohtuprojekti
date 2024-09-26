@@ -37,21 +37,32 @@ public class Statistics : MonoBehaviour
     }
     string ParseGSI(string jsonData)
     {
+        JObject data = JObject.Parse(jsonData); // parse JSON with Newtonsoft
+        var allPlayers = data["allplayers"];
+        if (allPlayers == null)
+        {
+            return "No players found.";
+        }
 
-        JObject data = JObject.Parse(jsonData); //parse newtonsoftilla
-        string playerName = data["player"]?["name"]?.ToString();
-        string team = data["player"]?["team"]?.ToString() ?? "No team assigned yet";
-        int health = data["player"]?["state"]?["health"]?.ToObject<int>() ?? 0;
-        int kills = data["player"]?["match_stats"]?["kills"]?.ToObject<int>() ?? 0;
-        int assists = data["player"]?["match_stats"]?["assists"]?.ToObject<int>() ?? 0;
-        int deaths = data["player"]?["match_stats"]?["deaths"]?.ToObject<int>() ?? 0;
-        string handledData = $"Player: {playerName}\n"+
-                             $"Team: {team}\n"+
-                             $"Health: {health}\n"+
-                             $"Kills: {kills} | Assists: {assists} | Deaths: {deaths}";
+        List<string> playerDetails = new List<string>();
 
-        return handledData;
+        foreach (var player in allPlayers)
+        {
+            string playerName = player.First["name"]?.ToString();
+            string team = player.First["team"]?.ToString() ?? "No team assigned yet";
+            int health = player.First["state"]?["health"]?.ToObject<int>() ?? 0;
+            int kills = player.First["match_stats"]?["kills"]?.ToObject<int>() ?? 0;
+            int assists = player.First["match_stats"]?["assists"]?.ToObject<int>() ?? 0;
+            int deaths = player.First["match_stats"]?["deaths"]?.ToObject<int>() ?? 0;
+
+            string handledData = $"Player: {playerName}\n" +
+                                $"Team: {team}\n" +
+                                $"Health: {health}\n" +
+                                $"Kills: {kills} | Assists: {assists} | Deaths: {deaths}\n";
+            playerDetails.Add(handledData);
     }
+    return string.Join("\n", playerDetails);
+}
 
 
 
