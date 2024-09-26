@@ -37,32 +37,13 @@ public class Statistics : MonoBehaviour
     }
     string ParseGSI(string jsonData)
     {
-        JObject data = JObject.Parse(jsonData); // parse JSON with Newtonsoft
-        var allPlayers = data["allplayers"];
-        if (allPlayers == null)
-        {
-            return "No players found.";
-        }
 
-        List<string> playerDetails = new List<string>();
+        JObject data = JObject.Parse(jsonData); //parse newtonsoftilla
+        string playerName = data["player"]?["name"]?.ToString();
+        string handledData = $"Player: {playerName}\n";
 
-        foreach (var player in allPlayers)
-        {
-            string playerName = player.First["name"]?.ToString();
-            string team = player.First["team"]?.ToString() ?? "No team assigned yet";
-            int health = player.First["state"]?["health"]?.ToObject<int>() ?? 0;
-            int kills = player.First["match_stats"]?["kills"]?.ToObject<int>() ?? 0;
-            int assists = player.First["match_stats"]?["assists"]?.ToObject<int>() ?? 0;
-            int deaths = player.First["match_stats"]?["deaths"]?.ToObject<int>() ?? 0;
-
-            string handledData = $"Player: {playerName} | " +
-                                $"Team: {team} | " +
-                                $"Health: {health} | " +
-                                $"Kills: {kills} | Assists: {assists} | Deaths: {deaths}\n";
-            playerDetails.Add(handledData);
+        return handledData;
     }
-    return string.Join("\n", playerDetails);
-}
 
 
 
