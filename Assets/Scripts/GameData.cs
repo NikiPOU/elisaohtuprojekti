@@ -11,6 +11,11 @@ public class Statistics : MonoBehaviour
 
     void Start()
     {
+        Initialize();
+    }
+
+    public void Initialize()
+    {
         if (text != null)
         {
 
