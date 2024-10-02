@@ -8,11 +8,9 @@ public class PlayerMovementTest
 {
     GameObject playerPrefab = Resources.Load<GameObject>("Prefabs/Terrorist");
 
-
-    // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
-    // `yield return null;` to skip a frame.
     [UnityTest]
     public IEnumerator TestPlayerMovement()
+    // Test that the player gameobject moves
     {
         Vector3 playerPos = new Vector3(0, 0.501f, 1);
         Quaternion playerDir = Quaternion.identity;
