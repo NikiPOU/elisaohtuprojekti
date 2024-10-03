@@ -4,19 +4,31 @@ using UnityEngine;
 using TMPro;
 using Newtonsoft.Json.Linq;
 
-
 public class Statistics : MonoBehaviour
 {
+    public TMP_Text text; // TextMeshPro component
+    public GSIDataReceiver gsiDataReceiver; // GSIDataReceiver script component
 
-    public TMP_Text text; //textMeshPro komponentti!
-    public GSIDataReceiver gsiDataReceiver; //GSIDataReceiver scriptistä komponentti
-    void Start()
+    // Initialize method for testing
+    public void Initialize()
     {
         if (text == null)
         {
-            Debug.Log("Teksti komponentissa ongelma"); 
+            Debug.LogError("Ei toimi: Teksti-komponentti puuttuu.");
+            return;
         }
-        
+
+        text.text = "Game statistics here"; // Set the default text
+    }
+
+    void Start()
+    {
+        // Check TMP_Text assignment and log an error if necessary
+        if (text == null)
+        {
+            Debug.LogError("Teksti komponentissa ongelma");
+        }
+
         gsiDataReceiver = FindObjectOfType<GSIDataReceiver>();
         if (gsiDataReceiver == null)
         {
@@ -28,16 +40,15 @@ public class Statistics : MonoBehaviour
     {
         if (gsiDataReceiver != null && text != null)
         {
-            //tässä eritellään tärkeä data turhasta
+            // Extract important data from GSI and update the display text
             string important = ParseGSI(gsiDataReceiver.gsiData);
-
-            text.text = important; //päivittää serveriltä saatua dataa näytölle
+            text.text = important; // Update the UI with server data
         }
-
     }
+
     string ParseGSI(string jsonData)
     {
-        JObject data = JObject.Parse(jsonData); // parse JSON with Newtonsoft
+        JObject data = JObject.Parse(jsonData); // Parse JSON using Newtonsoft
         var allPlayers = data["allplayers"];
         if (allPlayers == null)
         {
@@ -60,10 +71,7 @@ public class Statistics : MonoBehaviour
                                 $"Health: {health} | " +
                                 $"Kills: {kills} | Assists: {assists} | Deaths: {deaths}\n";
             playerDetails.Add(handledData);
+        }
+        return string.Join("\n", playerDetails);
     }
-    return string.Join("\n", playerDetails);
-}
-
-
-
 }
