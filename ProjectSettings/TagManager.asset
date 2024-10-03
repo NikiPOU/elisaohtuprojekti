@@ -3,7 +3,17 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Terrorist1
+  - Terrorist2
+  - Terrorist3
+  - Terrorist4
+  - Terrorist5
+  - CTerrorist1
+  - CTerrorist2
+  - CTerrorist3
+  - CTerrorist4
+  - CTerrorist5
   layers:
   - Default
   - TransparentFX
