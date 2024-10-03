@@ -15,11 +15,11 @@ public class MapMenuTest
         var mapScript = mapController.GetComponent<MapController>();
         mapScript.mapObject = mapPrefab;
 
-        mapScript.changeMaterial(2);
+        mapScript.changeMaterial(1);
 
         Material material = mapPrefab.GetComponent<Renderer>().sharedMaterial;
 
-        Assert.AreEqual(material.name, "Map_Dust2");
+        Assert.AreEqual(material.name, "Map_Anubis");
 
     }
 
