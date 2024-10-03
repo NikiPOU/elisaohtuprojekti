@@ -18,9 +18,7 @@ public class TerroristMovement : MonoBehaviour
     {
         if (Time.frameCount % 30 == 0)
         {
-            float x_coord = (float) GetRandomCoordinate('x');
-            float z_coord = (float) GetRandomCoordinate('z');
-            targetPosition = new Vector3(x_coord, 0.501f, z_coord);
+            UpdateTargetPosition();
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
         }
 
@@ -51,6 +49,12 @@ public class TerroristMovement : MonoBehaviour
 
         }
 
+    }
+    public void UpdateTargetPosition()
+    {
+        float x_coord = (float) GetRandomCoordinate('x');
+        float z_coord = (float) GetRandomCoordinate('z');
+        targetPosition = new Vector3(x_coord, 0.501f, z_coord);
     }
     
 }
