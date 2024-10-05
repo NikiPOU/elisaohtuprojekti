@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -5,6 +6,7 @@ using UnityEngine.Networking;
 public class GSIDataReceiver : MonoBehaviour
 {
     public string gsiData; //UUTTA tähän muuttujaan talletetaan gsi dataa
+    public event Action<string> OnDataReceived;
     private void Start()
     {
         StartCoroutine(GetGSIData("http://localhost:3000/data"));   // Kovakoodattuna portti 3000 väliaikaisesti
@@ -29,6 +31,7 @@ public class GSIDataReceiver : MonoBehaviour
                     gsiData = webRequest.downloadHandler.text; //gsiData muuttujaan talletetaan haettu data
                     // Printtaa GSI Datan Unity terminaaliin
                     Debug.Log("GSI Data: " + webRequest.downloadHandler.text);
+                    OnDataReceived?.Invoke(gsiData);
                 }
             }
 
