@@ -27,16 +27,28 @@ public class Statistics : MonoBehaviour
         if (text == null)
         {
             Debug.LogError("Teksti komponentissa ongelma");
+            return; //Exit if TMP text component is empty
         }
 
         gsiDataReceiver = FindObjectOfType<GSIDataReceiver>();
         if (gsiDataReceiver == null)
         {
             Debug.LogError("Ei toimi: GSI datan haussa ongelma.");
+            return; //Exit if GSI data receiver is nout found
+        }
+
+        gsiDataReceiver.OnDataReceived += StatisticsUpdate;
+    }
+
+    private void OnDestroy()
+    {
+        if (gsiDataReceiver != null)
+        {
+            gsiDataReceiver.OnDataReceived -= StatisticsUpdate;
         }
     }
 
-    void Update()
+    void StatisticsUpdate(string jsaonData)
     {
         if (gsiDataReceiver != null && text != null)
         {
