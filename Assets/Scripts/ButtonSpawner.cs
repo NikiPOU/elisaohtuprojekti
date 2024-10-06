@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ButtonSpawner : MonoBehaviour
 {
@@ -24,15 +25,14 @@ public class ButtonSpawner : MonoBehaviour
         // Loop to spawn buttons
         for (int i = 0; i < numberOfButtons; i++)
         {
-            Debug.LogError(i);
             // Instantiate a new button
             Button newButton = Instantiate(buttonPrefab, buttonParent);
 
             // Set button's text (optional)
-            Text buttonText = newButton.GetComponentInChildren<Text>();
+            TextMeshProUGUI buttonText = newButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
-                buttonText.text = "Button " + (i + 1);
+                buttonText.text = "Button" + i;
             }
         }
     }
