@@ -75,11 +75,5 @@ public class TerroristMovement : MonoBehaviour
         Vector3 targetPos5 = players.ElementAt(4).Value;
         terrorist5.transform.position = Vector3.MoveTowards(terrorist5.transform.position, targetPos5, speed * Time.deltaTime);
     }
-    public void UpdateTargetPosition()
-    {
-        float x_coord = (float) GetRandomCoordinate('x');
-        float z_coord = (float) GetRandomCoordinate('z');
-        targetPosition = new Vector3(x_coord, 0.501f, z_coord);
-    }
     
 }
