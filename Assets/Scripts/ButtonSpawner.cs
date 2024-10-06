@@ -28,7 +28,6 @@ public class ButtonSpawner : MonoBehaviour
             // Instantiate a new button
             Button newButton = Instantiate(buttonPrefab, buttonParent);
 
-            // Set button's text (optional)
             TextMeshProUGUI buttonText = newButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
