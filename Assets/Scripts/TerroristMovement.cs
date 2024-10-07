@@ -10,6 +10,8 @@ public class TerroristMovement : MonoBehaviour
     Vector3 targetPosition = new Vector3(-0.8f, 0.501f, 0.2f);
     GSIDataReceiver gsiDataReceiver;
 
+    Dictionary<string, Vector3> terrorists = new Dictionary<string, Vector3>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,6 +22,16 @@ public class TerroristMovement : MonoBehaviour
             return;
         }
 
+        gsiDataReceiver.OnDataReceived += UpdatePositions;
+
+    }
+
+    private void OnDestroy()
+    {
+        if (gsiDataReceiver != null)
+        {
+            gsiDataReceiver.OnDataReceived -= UpdatePositions;
+        }
     }
 
     // Update is called once per frame
@@ -28,12 +40,19 @@ public class TerroristMovement : MonoBehaviour
         MovePlayers();
     }
     
-    Dictionary<string, Vector3> ParseData(string jsonData)
+    void UpdatePositions(string jsonData)
+    {
+        if (gsiDataReceiver != null)
+        {
+            terrorists.Clear();
+            ParseData(jsonData);
+        }
+    }
+
+    void ParseData(string jsonData)
     {
         JObject data = JObject.Parse(jsonData);
         var allPlayers = data["allPlayers"];
-
-        Dictionary<string, Vector3> terrorists = new Dictionary<string, Vector3>();
 
         foreach (var player in allPlayers)
         {
@@ -47,33 +66,24 @@ public class TerroristMovement : MonoBehaviour
             }
             
         }
-        
-        return terrorists;
     }
 
     public void MovePlayers()
     {
-        Dictionary<string, Vector3> players = ParseData(gsiDataReceiver.gsiData);
-
-        GameObject terrorist1 = GameObject.FindWithTag("Terrorist1");
-        Vector3 targetPos1 = players.ElementAt(0).Value;
-        terrorist1.transform.position = Vector3.MoveTowards(terrorist1.transform.position, targetPos1, speed * Time.deltaTime);
-
-        GameObject terrorist2 = GameObject.FindWithTag("Terrorist2");
-        Vector3 targetPos2 = players.ElementAt(1).Value;
-        terrorist2.transform.position = Vector3.MoveTowards(terrorist2.transform.position, targetPos2, speed * Time.deltaTime);
-
-        GameObject terrorist3 = GameObject.FindWithTag("Terrorist3");
-        Vector3 targetPos3 = players.ElementAt(2).Value;
-        terrorist3.transform.position = Vector3.MoveTowards(terrorist3.transform.position, targetPos3, speed * Time.deltaTime);
-
-        GameObject terrorist4 = GameObject.FindWithTag("Terrorist4");
-        Vector3 targetPos4 = players.ElementAt(3).Value;
-        terrorist4.transform.position = Vector3.MoveTowards(terrorist4.transform.position, targetPos4, speed * Time.deltaTime);
-
-        GameObject terrorist5 = GameObject.FindWithTag("Terrorist5");
-        Vector3 targetPos5 = players.ElementAt(4).Value;
-        terrorist5.transform.position = Vector3.MoveTowards(terrorist5.transform.position, targetPos5, speed * Time.deltaTime);
+        if (gsiDataReceiver != null)
+        {
+            foreach (int index in Enumerable.Range(0, 4))
+            {   
+                int tagIndex = index + 1;
+                GameObject terrorist = GameObject.FindWithTag("Terrorist" + tagIndex);
+                if (terrorists.Count() != 0)
+                {    
+                    Vector3 targetPos = terrorists.ElementAt(index).Value;
+                    terrorist.transform.position = Vector3.MoveTowards(terrorist.transform.position, targetPos, speed * Time.deltaTime);
+                }
+        
+            }
+        }    
     }
     
 }
