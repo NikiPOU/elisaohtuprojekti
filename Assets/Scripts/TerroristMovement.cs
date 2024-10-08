@@ -56,7 +56,7 @@ public class TerroristMovement : MonoBehaviour
         
         if (allPlayers == null)
         {
-            return "No players found.";
+            return;
         }
 
         foreach (var player in allPlayers)
