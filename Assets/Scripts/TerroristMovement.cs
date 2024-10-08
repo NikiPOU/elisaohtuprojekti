@@ -52,7 +52,12 @@ public class TerroristMovement : MonoBehaviour
     void ParseData(string jsonData)
     {
         JObject data = JObject.Parse(jsonData);
-        var allPlayers = data["allPlayers"];
+        var allPlayers = data["allplayers"];
+        
+        if (allPlayers == null)
+        {
+            return "No players found.";
+        }
 
         foreach (var player in allPlayers)
         {
