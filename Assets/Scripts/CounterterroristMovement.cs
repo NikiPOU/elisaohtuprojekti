@@ -72,7 +72,7 @@ public class CounterterroristMovement : MonoBehaviour
                 float x_coord = float.Parse(coords[0]);
                 float y_coord = float.Parse(coords[1]);
                 float z_coord = float.Parse(coords[2]);
-                Vector3 position = new Vector3(0.001f * x_coord, 0, 0.001f * z_coord);
+                Vector3 position = new Vector3(0.001f * x_coord, 0.501f, 0.001f * z_coord);
                 cterrorists.Add(playerName, position);
             }
             
