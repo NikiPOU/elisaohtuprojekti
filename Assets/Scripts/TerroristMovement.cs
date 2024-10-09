@@ -66,7 +66,12 @@ public class TerroristMovement : MonoBehaviour
             if (team == "T")
             {
                 string playerName = player.First["name"]?.ToString();
-                Vector3 position = player.First["position"]?.ToObject<Vector3>() ?? new Vector3(0, 0, 0);
+                string stringPosition = player.First["position"]?.ToString();
+                string[] coords = stringPosition.Split(", ");
+                float x_coord = float.Parse(coords[0]);
+                float y_coord = float.Parse(coords[1]);
+                float z_coord = float.Parse(coords[2]);
+                Vector3 position = new Vector3(x_coord, y_coord, z_coord);
                 terrorists.Add(playerName, position);
             }
             
