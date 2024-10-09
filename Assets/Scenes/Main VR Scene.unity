@@ -1137,6 +1137,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Counterterrorist 5
       objectReference: {fileID: 0}
+    - target: {fileID: 6041701724466537169, guid: 4fe5df8e6e38e3de5acc23e7c3917e55,
+        type: 3}
+      propertyPath: m_TagString
+      value: CTerrorist5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2094,6 +2099,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Terrorist 2
       objectReference: {fileID: 0}
+    - target: {fileID: 6041701724466537169, guid: 5f0e85136acd48df1a083e13446788ac,
+        type: 3}
+      propertyPath: m_TagString
+      value: Terrorist2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2571,6 +2581,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Counterterrorist 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6041701724466537169, guid: 4fe5df8e6e38e3de5acc23e7c3917e55,
+        type: 3}
+      propertyPath: m_TagString
+      value: CTerrorist4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3525,6 +3540,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Terrorist 3
       objectReference: {fileID: 0}
+    - target: {fileID: 6041701724466537169, guid: 5f0e85136acd48df1a083e13446788ac,
+        type: 3}
+      propertyPath: m_TagString
+      value: Terrorist3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3621,6 +3641,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Terrorist 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6041701724466537169, guid: 5f0e85136acd48df1a083e13446788ac,
+        type: 3}
+      propertyPath: m_TagString
+      value: Terrorist4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6106,6 +6131,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Counterterrorist 2
       objectReference: {fileID: 0}
+    - target: {fileID: 6041701724466537169, guid: 4fe5df8e6e38e3de5acc23e7c3917e55,
+        type: 3}
+      propertyPath: m_TagString
+      value: CTerrorist2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6711,6 +6741,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Counterterrorist 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6041701724466537169, guid: 4fe5df8e6e38e3de5acc23e7c3917e55,
+        type: 3}
+      propertyPath: m_TagString
+      value: CTerrorist3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9145,6 +9180,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Terrorist 5
       objectReference: {fileID: 0}
+    - target: {fileID: 6041701724466537169, guid: 5f0e85136acd48df1a083e13446788ac,
+        type: 3}
+      propertyPath: m_TagString
+      value: Terrorist5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10426,6 +10466,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Counterterrorist 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6041701724466537169, guid: 4fe5df8e6e38e3de5acc23e7c3917e55,
+        type: 3}
+      propertyPath: m_TagString
+      value: CTerrorist1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10634,6 +10679,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Terrorist 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6041701724466537169, guid: 5f0e85136acd48df1a083e13446788ac,
+        type: 3}
+      propertyPath: m_TagString
+      value: Terrorist1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
