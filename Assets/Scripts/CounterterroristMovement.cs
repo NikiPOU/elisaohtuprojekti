@@ -1,61 +1,100 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 
 public class CounterterroristMovement : MonoBehaviour
 {
     public float speed = 0.2f;
     Vector3 targetPosition = new Vector3(-0.8f, 0.501f, 0.2f);
 
+    GSIDataReceiver gsiDataReceiver;
+
+    Dictionary<string, Vector3> cterrorists = new Dictionary<string, Vector3>();
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        gsiDataReceiver = FindObjectOfType<GSIDataReceiver>();
+
+        if (gsiDataReceiver == null)
+        {
+            return;
+        }
+
+        gsiDataReceiver.OnDataReceived += UpdatePositions;
+
+    }
+
+    private void OnDestroy()
+    {
+        if (gsiDataReceiver != null)
+        {
+            gsiDataReceiver.OnDataReceived -= UpdatePositions;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Time.frameCount % 30 == 0)
-        {
-            UpdateTargetPosition();
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-        }
-
-        else
-        {
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-        }
-
+        MovePlayers();
     }
-
     
-    public double GetRandomCoordinate(char coordinate)
+    void UpdatePositions(string jsonData)
     {
-        if (coordinate == 'x')
-        { 
-            double minimum = -0.8d;
-            double maximum = 0.8d;
-            System.Random random = new System.Random();
-            return random.NextDouble() * (maximum - minimum) + minimum;
-        }
-
-        else
+        if (gsiDataReceiver != null)
         {
-            double minimum = 0.2d;
-            double maximum = 1.9d;
-            System.Random random = new System.Random();
-            return random.NextDouble() * (maximum - minimum) + minimum;
+            cterrorists.Clear();
+            ParseData(jsonData);
+        }
+    }
 
+    void ParseData(string jsonData)
+    {
+        JObject data = JObject.Parse(jsonData);
+        var allPlayers = data["allplayers"];
+        
+        if (allPlayers == null)
+        {
+            return;
         }
 
+        foreach (var player in allPlayers)
+        {
+            string team = player.First["team"]?.ToString() ?? "No team assigned yet";
+
+            if (team == "CT")
+            {
+                string playerName = player.First["name"]?.ToString();
+                string stringPosition = player.First["position"]?.ToString();
+                string[] coords = stringPosition.Split(", ");
+                float x_coord = float.Parse(coords[0]);
+                float y_coord = float.Parse(coords[1]);
+                float z_coord = float.Parse(coords[2]);
+                Vector3 position = new Vector3(x_coord, y_coord, z_coord);
+                cterrorists.Add(playerName, position);
+            }
+            
+        }
     }
 
-    public void UpdateTargetPosition()
+    public void MovePlayers()
     {
-        float x_coord = (float) GetRandomCoordinate('x');
-        float z_coord = (float) GetRandomCoordinate('z');
-        targetPosition = new Vector3(x_coord, 0.501f, z_coord);
+        if (gsiDataReceiver != null)
+        {
+            foreach (int index in Enumerable.Range(0, 4))
+            {   
+                int tagIndex = index + 1;
+                GameObject cterrorist = GameObject.FindWithTag("CTerrorist" + tagIndex);
+                if (cterrorists.Count() != 0)
+                {    
+                    Vector3 targetPos = cterrorists.ElementAt(index).Value;
+                    cterrorist.transform.position = Vector3.MoveTowards(cterrorist.transform.position, targetPos, speed * Time.deltaTime);
+                }
+        
+            }
+        }    
     }
-
+    
 }
