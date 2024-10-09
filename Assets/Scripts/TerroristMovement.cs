@@ -71,7 +71,7 @@ public class TerroristMovement : MonoBehaviour
                 float x_coord = float.Parse(coords[0]);
                 float y_coord = float.Parse(coords[1]);
                 float z_coord = float.Parse(coords[2]);
-                Vector3 position = new Vector3(x_coord, 0, z_coord);
+                Vector3 position = new Vector3(0.01f * x_coord, 0, 0.01f * z_coord);
                 terrorists.Add(playerName, position);
             }
             
