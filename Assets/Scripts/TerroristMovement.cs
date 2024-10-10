@@ -69,8 +69,8 @@ public class TerroristMovement : MonoBehaviour
                 string stringPosition = player.First["position"]?.ToString();
                 string[] coords = stringPosition.Split(", ");
                 float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
-                float y_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
-                float z_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
+                float z_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
+                float y_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
                 Vector3 position = new Vector3(0.001f * x_coord, 0.501f, 1 + 0.001f * z_coord);
                 terrorists.Add(playerName, position);
             }
@@ -82,7 +82,7 @@ public class TerroristMovement : MonoBehaviour
     {
         if (gsiDataReceiver != null)
         {
-            foreach (int index in Enumerable.Range(0, 4))
+            foreach (int index in Enumerable.Range(0, 5))
             {   
                 int tagIndex = index + 1;
                 GameObject terrorist = GameObject.FindWithTag("Terrorist" + tagIndex);
