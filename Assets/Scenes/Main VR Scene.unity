@@ -5690,6 +5690,7 @@ GameObject:
   - component: {fileID: 1200208316}
   - component: {fileID: 1200208315}
   - component: {fileID: 1200208314}
+  - component: {fileID: 1200208318}
   m_Layer: 5
   m_Name: Heatmap Canvas
   m_TagString: Untagged
@@ -5738,7 +5739,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1200208312}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
   m_Name: 
@@ -5794,6 +5795,25 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &1200208318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1200208312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7951c64acb0fa62458bf30a60089fe2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 0
+  m_CheckFor2DOcclusion: 0
+  m_CheckFor3DOcclusion: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RaycastTriggerInteraction: 1
 --- !u!1 &1240490814
 GameObject:
   m_ObjectHideFlags: 0
@@ -8009,17 +8029,62 @@ PrefabInstance:
     - target: {fileID: 2258256778482153353, guid: 9f73a64168faab940a0eda8534b5f6e4,
         type: 3}
       propertyPath: m_Color.b
-      value: 0.3490566
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2258256778482153353, guid: 9f73a64168faab940a0eda8534b5f6e4,
         type: 3}
       propertyPath: m_Color.g
-      value: 0.12019401
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2258256778482153353, guid: 9f73a64168faab940a0eda8534b5f6e4,
         type: 3}
       propertyPath: m_Color.r
-      value: 0.14371593
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937182258154506514, guid: 9f73a64168faab940a0eda8534b5f6e4,
+        type: 3}
+      propertyPath: m_Colors.m_NormalColor.b
+      value: 0.34901962
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937182258154506514, guid: 9f73a64168faab940a0eda8534b5f6e4,
+        type: 3}
+      propertyPath: m_Colors.m_NormalColor.g
+      value: 0.121568635
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937182258154506514, guid: 9f73a64168faab940a0eda8534b5f6e4,
+        type: 3}
+      propertyPath: m_Colors.m_NormalColor.r
+      value: 0.14509805
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937182258154506514, guid: 9f73a64168faab940a0eda8534b5f6e4,
+        type: 3}
+      propertyPath: m_Colors.m_PressedColor.b
+      value: 0.16981131
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937182258154506514, guid: 9f73a64168faab940a0eda8534b5f6e4,
+        type: 3}
+      propertyPath: m_Colors.m_PressedColor.g
+      value: 0.07289071
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937182258154506514, guid: 9f73a64168faab940a0eda8534b5f6e4,
+        type: 3}
+      propertyPath: m_Colors.m_PressedColor.r
+      value: 0.07289071
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937182258154506514, guid: 9f73a64168faab940a0eda8534b5f6e4,
+        type: 3}
+      propertyPath: m_Colors.m_HighlightedColor.b
+      value: 0.5849056
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937182258154506514, guid: 9f73a64168faab940a0eda8534b5f6e4,
+        type: 3}
+      propertyPath: m_Colors.m_HighlightedColor.g
+      value: 0.25248247
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937182258154506514, guid: 9f73a64168faab940a0eda8534b5f6e4,
+        type: 3}
+      propertyPath: m_Colors.m_HighlightedColor.r
+      value: 0.23451404
       objectReference: {fileID: 0}
     - target: {fileID: 3937182258154506514, guid: 9f73a64168faab940a0eda8534b5f6e4,
         type: 3}
