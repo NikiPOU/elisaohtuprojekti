@@ -4327,6 +4327,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: heatmapPlayer
       objectReference: {fileID: 0}
+    - target: {fileID: 6041701724466537169, guid: 5f0e85136acd48df1a083e13446788ac,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4371,10 +4376,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbfc1be50dcf806449c8e99db8914225, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.2
+  gsiDataReceiver: {fileID: 0}
   targetPosition: {x: 2.795, y: 2, z: 1}
   tracePrefab: {fileID: 2262391228921639676, guid: 78eb52c467ba3054a9772a1cf8bfdea4,
     type: 3}
+  parent: {fileID: 914739469}
 --- !u!1 &834615277
 GameObject:
   m_ObjectHideFlags: 0
@@ -6927,7 +6933,7 @@ PrefabInstance:
     - target: {fileID: 6598815579406187037, guid: 18ddb545287c546e19cc77dc9fbb2189,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10839,6 +10845,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: TraceMarker
+      objectReference: {fileID: 0}
+    - target: {fileID: 7303259643842788698, guid: 78eb52c467ba3054a9772a1cf8bfdea4,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 7303259643842788698, guid: 78eb52c467ba3054a9772a1cf8bfdea4,
         type: 3}
