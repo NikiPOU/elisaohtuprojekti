@@ -68,6 +68,7 @@ public class ButtonSpawner : MonoBehaviour
                 {
                     buttonText.text = newPlayerNames[i];
                 }
+                AssignButtonAction(buttons[i], newPlayerNames[i]);
             }
             else
             {
@@ -84,8 +85,32 @@ public class ButtonSpawner : MonoBehaviour
                     buttonText.color = Color.white;
                 }
 
+                AssignButtonAction(newButton, newPlayerNames[i]);
                 buttons.Add(newButton);
             }
+        }
+    }
+
+        void AssignButtonAction(Button button, string playerName)
+    {
+        // Remove previous listeners to avoid duplication
+        button.onClick.RemoveAllListeners();
+
+        // Add a listener to call ButtonClicked with the player's name
+        button.onClick.AddListener(() => ButtonClicked(playerName));
+    }
+
+    void ButtonClicked(string playerName)
+    {
+        // Call the method in the other script (replace 'OtherScript' with the actual script name)
+        HeatMapPlayerMovement HeatmapScript = FindObjectOfType<HeatMapPlayerMovement>();
+        if (HeatmapScript != null)
+        {
+            HeatmapScript.ButtonClicked(playerName);
+        }
+        else
+        {
+            Debug.LogError("HeatmapScript not found.");
         }
     }
 

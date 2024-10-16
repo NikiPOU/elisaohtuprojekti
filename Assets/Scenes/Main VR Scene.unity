@@ -1476,6 +1476,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Heatmap Picture
       objectReference: {fileID: 0}
+    - target: {fileID: 4600929797860946124, guid: e2d5e452dc8128ee4b756379b871be1c,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 08b94badad078af44ae61b9dbfc5c934, type: 2}
     - target: {fileID: 8475857485863734421, guid: e2d5e452dc8128ee4b756379b871be1c,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4531,7 +4536,7 @@ PrefabInstance:
     - target: {fileID: 254380142678951502, guid: 5f0e85136acd48df1a083e13446788ac,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.795
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 254380142678951502, guid: 5f0e85136acd48df1a083e13446788ac,
         type: 3}
@@ -4633,7 +4638,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gsiDataReceiver: {fileID: 0}
-  targetPosition: {x: 2.795, y: 2, z: 1}
+  playerName: 
+  position: {x: 0, y: 0, z: 0}
   tracePrefab: {fileID: 2262391228921639676, guid: 78eb52c467ba3054a9772a1cf8bfdea4,
     type: 3}
   parent: {fileID: 914739469}
@@ -11725,12 +11731,17 @@ PrefabInstance:
     - target: {fileID: 7303259643842788698, guid: 78eb52c467ba3054a9772a1cf8bfdea4,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.1
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 7303259643842788698, guid: 78eb52c467ba3054a9772a1cf8bfdea4,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 7303259643842788698, guid: 78eb52c467ba3054a9772a1cf8bfdea4,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.7980653
+      value: 10000
       objectReference: {fileID: 0}
     - target: {fileID: 7303259643842788698, guid: 78eb52c467ba3054a9772a1cf8bfdea4,
         type: 3}

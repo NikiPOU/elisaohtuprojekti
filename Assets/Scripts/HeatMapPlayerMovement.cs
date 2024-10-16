@@ -4,25 +4,26 @@ using UnityEngine;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 
-public class PlayerMovement : MonoBehaviour
+public class HeatMapPlayerMovement : MonoBehaviour
 {
     public GSIDataReceiver gsiDataReceiver;
-    Vector3 position = new Vector3(0f, 0f, 0f);
-    public Vector3 targetPosition = new Vector3(2.795f, 2f, 1f);
+    public string playerName = null;
+    public Vector3 position;
     public GameObject tracePrefab;
     public Transform parent;
-    List<Vector3> positions = new List<Vector3>();
     Dictionary<string, int> coordinates = new Dictionary<string, int>();
     Dictionary<string, GameObject> gameObjects = new Dictionary<string, GameObject>();
     Dictionary<int, List<double>> colors = new Dictionary<int, List<double>>()
     {
-        {5, new List<double> { 0, 255, 135, 0.8 }},
-        {10, new List<double> { 120, 255, 0, 0.8 }},
-        {15, new List<double> { 247, 255, 0, 0.8 }},
-        {20, new List<double> { 255, 162, 0, 0.8 }},
-        {25, new List<double> { 255, 98, 0, 0.8 }},
-        {30, new List<double> { 161, 0, 0, 0.8 }}
+        {5, new List<double> { 173, 216, 230, 0.8 }}, 
+        {10, new List<double> { 0, 255, 255, 0.8 }},
+        {15, new List<double> { 144, 238, 144, 0.8 }},
+        {20, new List<double> { 255, 255, 0, 0.8 }},
+        {25, new List<double> { 255, 165, 0, 0.8 }},
+        {30, new List<double> { 255, 0, 0, 0.8 }},
+        {35, new List<double> { 139, 0, 0, 0.8 }}
     };
+
 
     void Start()
     {
@@ -46,15 +47,14 @@ public class PlayerMovement : MonoBehaviour
 
     void LeaveTrace()
     {
-        if (tracePrefab != null)
+        if (tracePrefab != null && position != Vector3.zero && playerName != null)
         {
-            Vector3 currentPosition = targetPosition;
+            Vector3 currentPosition = position; // Use the updated 'position'
             Color traceColor;
 
             if (coordinates.ContainsKey(currentPosition.ToString()))
             {
-                Debug.Log("Koordinaatti löytyy sanakirjasta");
-                coordinates[currentPosition.ToString()]+=1;
+                coordinates[currentPosition.ToString()] += 1;
                 Debug.Log(coordinates);
                 if (colors.ContainsKey(coordinates[currentPosition.ToString()]))
                 {
@@ -62,60 +62,72 @@ public class PlayerMovement : MonoBehaviour
                     Renderer renderer = currentGameObject.GetComponent<Renderer>();
                     Material existingMaterial = renderer.material;
                     List<double> color = colors[coordinates[currentPosition.ToString()]];
-                    Color newColor = new Color((float)(color[0]/255.0), (float)(color[1]/255.0), 
-                    (float)(color[2]/255.0), (float)color[3]);
+                    Color newColor = new Color((float)(color[0] / 255.0), (float)(color[1] / 255.0),
+                    (float)(color[2] / 255.0), (float)color[3]);
                     existingMaterial.color = newColor;
                 }
             }
             else
             {
-                Debug.Log("Koordinaatti ei löydy sanakirjasta");
-                coordinates.Add(currentPosition.ToString(),1);
+                coordinates.Add(currentPosition.ToString(), 1);
                 GameObject newTrace = Instantiate(tracePrefab, currentPosition, Quaternion.identity);
                 newTrace.transform.SetParent(parent);
                 newTrace.transform.localPosition = currentPosition;
                 newTrace.transform.localRotation = Quaternion.identity;
-                gameObjects.Add(currentPosition.ToString(),newTrace);
+                gameObjects.Add(currentPosition.ToString(), newTrace);
             }
         }
     }
+
     public void UpdateTargetPosition(string jsonData)
     {
         if (gsiDataReceiver != null)
         {
-            targetPosition = ParseGSI(gsiDataReceiver.gsiData);
+            // Update the target position based on the parsed GSI data
+            position = ParseGSI(gsiDataReceiver.gsiData);
+            Debug.Log("Updated player position: " + position);
         }
-        LeaveTrace();
+        LeaveTrace(); // Leave trace after updating the position
     }
 
     Vector3 ParseGSI(string jsonData)
     {
-        List<Vector3> positions = new List<Vector3>();
         JObject data = JObject.Parse(jsonData); // Parse JSON using Newtonsoft
         var allPlayers = data["allplayers"];
-        if (allPlayers == null)
+        if (allPlayers == null || playerName == null)
         {
+            Debug.Log("playername null");
             return position;
         }
 
         foreach (var player in allPlayers)
         {
-            string team = player.First["team"]?.ToString() ?? "No team assigned yet";
-            if (team == "T")
+            string name = player.First["name"]?.ToString();
+            if (name == playerName)
             {
                 string stringPosition = player.First["position"]?.ToString();
-                string[] coords = stringPosition.Split(", ");
-                float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
-                float y_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
-                float z_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
-                Vector3 position = new Vector3(0.00022f * x_coord + 0.2f, 0.00022f * y_coord - 0.2f, 0f);
-                positions.Add(position);
+                if (!string.IsNullOrEmpty(stringPosition))
+                {
+                    string[] coords = stringPosition.Split(", ");
+                    if (coords.Length == 3)
+                    {
+                        float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
+                        float y_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
+                        float z_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
+
+                        // Update the global position variable
+                        position = new Vector3(0.00022f * x_coord + 0.2f, 0.00022f * y_coord - 0.2f, 0f);
+                        return position; // Return the updated position
+                    }
+                }
             }
         }
-        Debug.Log("Position" + position);
-        position = positions[0];
         return position;
     }
+
+    public void ButtonClicked(string player)
+    {
+        Debug.Log("Button clicked for player: " + player);
+        playerName = player;
+    }
 }
-// x: -2203.84, y: -1031.97, z: 128.23 vasenala
-// x: -2093.97, y: 3117.97, z: 35.71 vasen ylä
