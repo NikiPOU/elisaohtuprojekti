@@ -91,7 +91,7 @@ public class PlayerMovement : MonoBehaviour
             float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
             float z_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
             float y_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
-            Vector3 position = new Vector3(0.0005f * x_coord, 0.501f, 0.00065f * z_coord);
+            Vector3 position = new Vector3(0.0006f * x_coord - 0.02f, 0.501f, 0.0006f * z_coord - 0.65f);
             if (team == "CT")
             {
                 cterroristsPositions[playerName] = position; // Add to the dictionary
