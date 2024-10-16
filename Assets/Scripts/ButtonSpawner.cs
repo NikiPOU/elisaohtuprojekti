@@ -1,39 +1,128 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 public class ButtonSpawner : MonoBehaviour
 {
-    // Reference to the button prefab
     public Button buttonPrefab;
-
-    // Parent object for the buttons (Panel with Grid Layout Group)
     public Transform buttonParent;
-
-    // Number of buttons to create
-    public int numberOfButtons = 10;
+    public GSIDataReceiver gsiDataReceiver;
+    private List<string> playerNames = new List<string>();
+    private List<Button> buttons = new List<Button>();
 
     void Start()
     {
-        // Ensure buttonParent is set (Panel)
-        if (buttonParent == null)
+        gsiDataReceiver = FindObjectOfType<GSIDataReceiver>();
+        if (gsiDataReceiver == null)
         {
-            Debug.LogError("Button Parent is not set!");
+            Debug.LogError("Ei toimi: GSI datan haussa ongelma.");
             return;
         }
 
-        // Loop to spawn buttons
-        for (int i = 0; i < numberOfButtons; i++)
-        {
-            // Instantiate a new button
-            Button newButton = Instantiate(buttonPrefab, buttonParent);
+        gsiDataReceiver.OnDataReceived += StatisticsUpdate;
+        StatisticsUpdate(gsiDataReceiver.gsiData);
+    }
 
-            TextMeshProUGUI buttonText = newButton.GetComponentInChildren<TextMeshProUGUI>();
-            if (buttonText != null)
+    private void OnDestroy()
+    {
+        if (gsiDataReceiver != null)
+        {
+            gsiDataReceiver.OnDataReceived -= StatisticsUpdate;
+        }
+    }
+
+    void StatisticsUpdate(string jsonData)
+    {
+        if (!string.IsNullOrEmpty(jsonData))
+        {
+            List<string> newPlayerNames = ParseGSI(jsonData);
+            if (!ArePlayerListsEqual(playerNames, newPlayerNames))
             {
-                buttonText.text = "Button" + i;
+                UpdateButtons(newPlayerNames);
+                playerNames = new List<string>(newPlayerNames);
+            }
+        }
+        else
+        {
+            Debug.LogError("Ei json dataa.");
+        }
+    }
+
+    void UpdateButtons(List<string> newPlayerNames)
+    {
+        // Hoitaa nappien päivityksen, kun pelaajat vaihtuvat
+        while (buttons.Count > newPlayerNames.Count)
+        {
+            Destroy(buttons[buttons.Count - 1].gameObject);
+            buttons.RemoveAt(buttons.Count - 1);
+        }
+
+        for (int i = 0; i < newPlayerNames.Count; i++)
+        {
+            if (i < buttons.Count)
+            {
+                TextMeshProUGUI buttonText = buttons[i].GetComponentInChildren<TextMeshProUGUI>();
+                if (buttonText != null)
+                {
+                    buttonText.text = newPlayerNames[i];
+                }
+            }
+            else
+            {
+                Button newButton = Instantiate(buttonPrefab, buttonParent);
+                
+                Vector3 newPosition = newButton.transform.localPosition;
+                newPosition.x += i * 0.75f; // Jokainen nappi 0,75 välillä edelliseen
+                newButton.transform.localPosition = newPosition;
+
+                TextMeshProUGUI buttonText = newButton.GetComponentInChildren<TextMeshProUGUI>();
+                if (buttonText != null)
+                {
+                    buttonText.text = newPlayerNames[i];
+                    buttonText.color = Color.white;
+                }
+
+                buttons.Add(newButton);
             }
         }
     }
-}
 
+    bool ArePlayerListsEqual(List<string> oldList, List<string> newList)
+    // Tarkistaa, onko pelaajia vaihtunut
+    {
+        if (oldList.Count != newList.Count) return false;
+
+        for (int i = 0; i < oldList.Count; i++)
+        {
+            if (oldList[i] != newList[i]) return false;
+        }
+
+        return true;
+    }
+
+    List<string> ParseGSI(string jsonData)
+    // Etsii datasta pelaaja nimet listaan
+    {
+        JObject data = JObject.Parse(jsonData);
+        var allPlayers = data["allplayers"];
+        if (allPlayers == null)
+        {
+            Debug.LogError("Pelaajia ei löytynyt datasta.");
+            return new List<string>();
+        }
+
+        List<string> playerDetails = new List<string>();
+
+        foreach (var player in allPlayers)
+        {
+            string playerName = player.First["name"]?.ToString();
+            if (!string.IsNullOrEmpty(playerName))
+            {
+                playerDetails.Add(playerName);
+            }
+        }
+        return playerDetails;
+    }
+}

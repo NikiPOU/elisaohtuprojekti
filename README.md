@@ -9,10 +9,11 @@ A prototype of an AR Counter-Strike 2 coaching/refereeing tool for Elisa eSports
 - [Client meeting 0](https://github.com/NikiPOU/elisaohtuprojekti/blob/main/docs/client_meeting_0.md)
 - [Client meeting 1](https://github.com/NikiPOU/elisaohtuprojekti/blob/main/docs/client_meeting_1.md)
 - [Client meeting 2](https://github.com/NikiPOU/elisaohtuprojekti/blob/main/docs/client_meeting_2.md)
+- [Client meeting 3](https://github.com/NikiPOU/elisaohtuprojekti/blob/main/docs/client_meeting_3.md) 
 ### Retrospectives
 - [Retro 0](https://github.com/NikiPOU/elisaohtuprojekti/blob/main/docs/retrospective_0.md)
 - [Retro 1](https://github.com/NikiPOU/elisaohtuprojekti/blob/main/docs/retrospective_1.md)
-
+- [Retro 2](https://github.com/NikiPOU/elisaohtuprojekti/blob/main/docs/retrospective_2.md)
 ## Implementation
 - Implemented for Meta Quest VR headsets (Android-based)
 - Developed in Unity environment
@@ -22,3 +23,4 @@ A prototype of an AR Counter-Strike 2 coaching/refereeing tool for Elisa eSports
 
 ## Backlog
 - [Product backlog](https://github.com/users/NikiPOU/projects/2)
+
