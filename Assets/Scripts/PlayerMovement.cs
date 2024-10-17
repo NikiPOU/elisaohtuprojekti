@@ -50,7 +50,7 @@ public class PlayerMovement : MonoBehaviour
         // Instantiate the Counter-Terrorists based on the maximum number needed
         for (int i = 0; i < 5; i++) // Change the number based on the maximum number of Counter-Terrorists
         {
-            GameObject newCT = Instantiate(counterTerroristPrefab, new Vector3(i * 0.05f - 0.15f, 0.501f, 0.3f), Quaternion.identity);
+            GameObject newCT = Instantiate(counterTerroristPrefab, new Vector3(i * 0.05f, 0.501f, 0.7f), Quaternion.identity);
             newCT.transform.parent = transform; // Make the Counter-Terrorist a child of this manager
             newCT.name = "CounterTerrorist" + (i + 1); // Naming for later reference
             cterroristsGameObjects.Add(newCT); // Add to the list
@@ -58,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
         // Instantiate terrorists
         for (int i = 0; i < 5; i++) 
         {
-            GameObject newT = Instantiate(terroristPrefab, new Vector3(i * 0.05f - 0.6f, 0.501f, -1.2f), Quaternion.identity);
+            GameObject newT = Instantiate(terroristPrefab, new Vector3(i * 0.05f - 0.6f, 0.501f, -1.1f), Quaternion.identity);
             newT.transform.parent = transform; // Make the Counter-Terrorist a child of this manager
             newT.name = "Terrorist" + (i + 1); // Naming for later reference
             terroristsGameObjects.Add(newT); // Add to the list
