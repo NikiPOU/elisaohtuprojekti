@@ -116,7 +116,8 @@ public class HeatMapPlayerMovement : MonoBehaviour
                         float z_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
 
                         // Update the global position variable
-                        position = new Vector3(0.00022f * x_coord + 0.2f, 0.00022f * y_coord - 0.2f, 0f);
+                        position = new Vector3(0.000215f * x_coord + 0.052f, 0.000217f * y_coord - 0.21f, 0f);
+                        //Vector3 position = new Vector3(0.0006f * x_coord - 0.02f, 0.501f, 0.0006f * z_coord - 0.65f);
                         return position; // Return the updated position
                     }
                 }
