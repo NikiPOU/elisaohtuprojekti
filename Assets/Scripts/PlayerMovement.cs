@@ -6,15 +6,17 @@ using System.Linq;
 public class PlayerMovement : MonoBehaviour
 {
     public float speed = 0.2f; // Speed for movement
-    public GameObject counterTerroristPrefab; // Reference to the Counter-Terrorist prefab
-    public GameObject terroristPrefab;
+    public GameObject counterTerroristPrefab; // Prefab for Counter-Terrorists
+    public GameObject terroristPrefab; // Prefab for Terrorists
+
+    // Parent objects for the players under the map in the hierarchy
+    public Transform counterTerroristsParent;
+    public Transform terroristsParent;
+    
     private GSIDataReceiver gsiDataReceiver;
 
-    // Dictionaries to hold the positions of the Counter-Terrorists and Terrorists
-    private Dictionary<string, Vector3> cterroristsPositions = new Dictionary<string, Vector3>();
-    private Dictionary<string, Vector3> terroristsPositions = new Dictionary<string, Vector3>();
-    private List<GameObject> cterroristsGameObjects = new List<GameObject>(); // To hold instantiated Counter-Terrorists
-    private List<GameObject> terroristsGameObjects = new List<GameObject>();
+    // Dictionary to store player objects based on their name
+    private Dictionary<string, GameObject> playerGameObjects = new Dictionary<string, GameObject>();
 
     void Start()
     {
@@ -26,113 +28,111 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        gsiDataReceiver.OnDataReceived += UpdatePositions;
-
-        // Spawn initial players
-        SpawnPlayers();
+        // Subscribe to the data update event
+        gsiDataReceiver.OnDataReceived += UpdatePlayers;
     }
 
     private void OnDestroy()
     {
+        // Unsubscribe from the data update event
         if (gsiDataReceiver != null)
         {
-            gsiDataReceiver.OnDataReceived -= UpdatePositions;
+            gsiDataReceiver.OnDataReceived -= UpdatePlayers;
         }
     }
 
     void Update()
     {
+        // Move players every frame
         MovePlayers();
     }
-    
-    void SpawnPlayers()
-    {
-        // Instantiate the Counter-Terrorists based on the maximum number needed
-        for (int i = 0; i < 5; i++) // Change the number based on the maximum number of Counter-Terrorists
-        {
-            GameObject newCT = Instantiate(counterTerroristPrefab, new Vector3(i * 0.05f, 0.501f, 0.7f), Quaternion.identity);
-            newCT.transform.parent = transform; // Make the Counter-Terrorist a child of this manager
-            newCT.name = "CounterTerrorist" + (i + 1); // Naming for later reference
-            cterroristsGameObjects.Add(newCT); // Add to the list
-        }
-        // Instantiate terrorists
-        for (int i = 0; i < 5; i++) 
-        {
-            GameObject newT = Instantiate(terroristPrefab, new Vector3(i * 0.05f - 0.6f, 0.501f, -1.1f), Quaternion.identity);
-            newT.transform.parent = transform; // Make the Counter-Terrorist a child of this manager
-            newT.name = "Terrorist" + (i + 1); // Naming for later reference
-            terroristsGameObjects.Add(newT); // Add to the list
-        }
-    }     
 
-    void UpdatePositions(string jsonData)
+    // Updates player positions and creates/destroys objects if necessary
+    void UpdatePlayers(string jsonData)
     {
-        cterroristsPositions.Clear();
-        terroristsPositions.Clear();
-        ParseData(jsonData);
-    }
-
-    void ParseData(string jsonData)
-    {
+        // Parse the received data
         JObject data = JObject.Parse(jsonData);
         var allPlayers = data["allplayers"];
-        
+
         if (allPlayers == null)
         {
             return;
         }
 
+        // Store the new player data in a temporary dictionary
+        Dictionary<string, Vector3> newPlayerPositions = new Dictionary<string, Vector3>();
+        Dictionary<string, string> newPlayerTeams = new Dictionary<string, string>();
+
         foreach (var player in allPlayers)
         {
             string playerName = player.First["name"]?.ToString();
-            string team = player.First["team"]?.ToString() ?? "No team assigned yet";
-            string stringPosition = player.First["position"]?.ToString();
-            string[] coords = stringPosition.Split(", ");
+            string team = player.First["team"]?.ToString();
+            string positionString = player.First["position"]?.ToString();
+
+            if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(team) || string.IsNullOrEmpty(positionString))
+                continue;
+
+            string[] coords = positionString.Split(", ");
             float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
             float z_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
             float y_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
-            Vector3 position = new Vector3(0.0006f * x_coord - 0.02f, 0.501f, 0.0006f * z_coord - 0.65f);
-            if (team == "CT")
-            {
-                cterroristsPositions[playerName] = position; // Add to the dictionary
-            }
 
-            else if (team == "T")
+            // Apply scaling to the coordinates
+            Vector3 position = new Vector3(0.0006f * x_coord - 0.02f, 0.501f, 0.0006f * z_coord - 0.65f);
+
+            // Store player data
+            newPlayerPositions[playerName] = position;
+            newPlayerTeams[playerName] = team;
+        }
+
+        // Remove old players who are not in the new data
+        var playersToRemove = playerGameObjects.Keys.Except(newPlayerPositions.Keys).ToList();
+        foreach (string playerName in playersToRemove)
+        {
+            Destroy(playerGameObjects[playerName]);
+            playerGameObjects.Remove(playerName);
+        }
+
+        // Create new players and update existing ones
+        foreach (var kvp in newPlayerPositions)
+        {
+            string playerName = kvp.Key;
+            Vector3 targetPosition = kvp.Value;
+            string team = newPlayerTeams[playerName];
+
+            // If player already exists, update position
+            if (playerGameObjects.ContainsKey(playerName))
             {
-                terroristsPositions[playerName] = position;
+                GameObject playerObject = playerGameObjects[playerName];
+                playerObject.transform.position = targetPosition;
             }
-            
+            // If player doesn't exist, create a new object under the correct parent
+            else
+            {
+                GameObject prefab = (team == "CT") ? counterTerroristPrefab : terroristPrefab;
+                Transform parent = (team == "CT") ? counterTerroristsParent : terroristsParent;
+                
+                // Instantiate under the correct parent
+                GameObject newPlayerObject = Instantiate(prefab, targetPosition, Quaternion.identity, parent);
+                newPlayerObject.name = playerName;
+                playerGameObjects[playerName] = newPlayerObject;
+            }
         }
     }
-    
 
+    // Moves players to their target positions
     void MovePlayers()
     {
-        for (int i = 0; i < cterroristsGameObjects.Count; i++)
+        foreach (var kvp in playerGameObjects)
         {
-            if (i < cterroristsPositions.Count)
-            {
-                string playerName = cterroristsPositions.ElementAt(i).Key; // Get player name
-                if (cterroristsPositions.TryGetValue(playerName, out Vector3 targetPos))
-                {
-                    // Move the player towards the target position
-                    GameObject cterrorist = cterroristsGameObjects[i];
-                    cterrorist.transform.position = Vector3.MoveTowards(cterrorist.transform.position, targetPos, speed * Time.deltaTime);
-                }
-            }
-        }
+            GameObject playerObject = kvp.Value;
+            string playerName = kvp.Key;
 
-        for (int i = 0; i < terroristsGameObjects.Count; i++)
-        {
-            if (i < terroristsPositions.Count)
+            // Get the target position from the current player data
+            if (playerGameObjects.TryGetValue(playerName, out GameObject obj))
             {
-                string playerName = terroristsPositions.ElementAt(i).Key; // Get player name
-                if (terroristsPositions.TryGetValue(playerName, out Vector3 targetPos))
-                {
-                    // Move the player towards the target position
-                    GameObject terrorist = terroristsGameObjects[i];
-                    terrorist.transform.position = Vector3.MoveTowards(terrorist.transform.position, targetPos, speed * Time.deltaTime);
-                }
+                Vector3 targetPos = obj.transform.position;
+                playerObject.transform.position = Vector3.MoveTowards(playerObject.transform.position, targetPos, speed * Time.deltaTime);
             }
         }
     }

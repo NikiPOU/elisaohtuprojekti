@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2913687198154946637}
   - component: {fileID: 2048384023744959692}
   m_Layer: 0
-  m_Name: CounterTerrorist
+  m_Name: Counterterrorist
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -113,10 +113,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8216439050104495676}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cf311b67e0db68b07b67f1dfed153b19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0.2
   counterTerroristPrefab: {fileID: 0}
+  terroristPrefab: {fileID: 0}
+  counterTerroristsParent: {fileID: 0}
+  terroristsParent: {fileID: 0}
