@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using System;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -10,8 +11,8 @@ public class PlayerMovement : MonoBehaviour
     public GameObject terroristPrefab;
     public Color damageFlashColor = Color.red;
     public float flashDuration = 0.2f;
-    public Transform counterTerroristsParent;
-    public Transform terroristsParent;
+    [NonSerialized] public Transform counterTerroristsParent;
+    [NonSerialized] public Transform terroristsParent;
     private GSIDataReceiver gsiDataReceiver;
     private Dictionary<string, GameObject> playerGameObjects = new Dictionary<string, GameObject>();
     private Dictionary<string, int> previousPlayerHealth = new Dictionary<string, int>();
