@@ -2173,7 +2173,7 @@ MonoBehaviour:
       m_Calls: []
   m_AttachTransform: {fileID: 0}
   m_SecondaryAttachTransform: {fileID: 0}
-  m_UseDynamicAttach: 0
+  m_UseDynamicAttach: 1
   m_MatchAttachPosition: 1
   m_MatchAttachRotation: 1
   m_SnapToColliderVolume: 1
@@ -6880,6 +6880,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dust2
       objectReference: {fileID: 0}
+    - target: {fileID: 7002830836184632222, guid: c8b2e5593a779a04e91af8cdf77abe77,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8538908634020977664, guid: c8b2e5593a779a04e91af8cdf77abe77,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -9371,7 +9376,7 @@ MonoBehaviour:
       m_Calls: []
   m_AttachTransform: {fileID: 0}
   m_SecondaryAttachTransform: {fileID: 0}
-  m_UseDynamicAttach: 0
+  m_UseDynamicAttach: 1
   m_MatchAttachPosition: 1
   m_MatchAttachRotation: 1
   m_SnapToColliderVolume: 1
