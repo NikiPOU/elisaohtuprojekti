@@ -5,16 +5,17 @@ using System.Linq;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float speed = 0.2f; // Speed for movement
-    public GameObject counterTerroristPrefab; // Reference to the Counter-Terrorist prefab
+    public float speed = 0.2f;
+    public GameObject counterTerroristPrefab;
     public GameObject terroristPrefab;
+    public Color damageFlashColor = Color.red;
+    public float flashDuration = 0.2f;
+    public Transform counterTerroristsParent;
+    public Transform terroristsParent;
     private GSIDataReceiver gsiDataReceiver;
-
-    // Dictionaries to hold the positions of the Counter-Terrorists and Terrorists
-    private Dictionary<string, Vector3> cterroristsPositions = new Dictionary<string, Vector3>();
-    private Dictionary<string, Vector3> terroristsPositions = new Dictionary<string, Vector3>();
-    private List<GameObject> cterroristsGameObjects = new List<GameObject>(); // To hold instantiated Counter-Terrorists
-    private List<GameObject> terroristsGameObjects = new List<GameObject>();
+    private Dictionary<string, GameObject> playerGameObjects = new Dictionary<string, GameObject>();
+    private Dictionary<string, int> previousPlayerHealth = new Dictionary<string, int>();
+    private Dictionary<string, bool> playerAliveState = new Dictionary<string, bool>();
 
     void Start()
     {
@@ -26,17 +27,14 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        gsiDataReceiver.OnDataReceived += UpdatePositions;
-
-        // Spawn initial players
-        SpawnPlayers();
+        gsiDataReceiver.OnDataReceived += UpdatePlayers;
     }
 
     private void OnDestroy()
     {
         if (gsiDataReceiver != null)
         {
-            gsiDataReceiver.OnDataReceived -= UpdatePositions;
+            gsiDataReceiver.OnDataReceived -= UpdatePlayers;
         }
     }
 
@@ -44,96 +42,150 @@ public class PlayerMovement : MonoBehaviour
     {
         MovePlayers();
     }
-    
-    void SpawnPlayers()
-    {
-        // Instantiate the Counter-Terrorists based on the maximum number needed
-        for (int i = 0; i < 5; i++) // Change the number based on the maximum number of Counter-Terrorists
-        {
-            GameObject newCT = Instantiate(counterTerroristPrefab, new Vector3(i * 0.05f, 0.501f, 0.7f), Quaternion.identity);
-            newCT.transform.parent = transform; // Make the Counter-Terrorist a child of this manager
-            newCT.name = "CounterTerrorist" + (i + 1); // Naming for later reference
-            cterroristsGameObjects.Add(newCT); // Add to the list
-        }
-        // Instantiate terrorists
-        for (int i = 0; i < 5; i++) 
-        {
-            GameObject newT = Instantiate(terroristPrefab, new Vector3(i * 0.05f - 0.6f, 0.501f, -1.1f), Quaternion.identity);
-            newT.transform.parent = transform; // Make the Counter-Terrorist a child of this manager
-            newT.name = "Terrorist" + (i + 1); // Naming for later reference
-            terroristsGameObjects.Add(newT); // Add to the list
-        }
-    }     
 
-    void UpdatePositions(string jsonData)
-    {
-        cterroristsPositions.Clear();
-        terroristsPositions.Clear();
-        ParseData(jsonData);
-    }
-
-    void ParseData(string jsonData)
+    void UpdatePlayers(string jsonData)
     {
         JObject data = JObject.Parse(jsonData);
         var allPlayers = data["allplayers"];
-        
+
         if (allPlayers == null)
         {
             return;
         }
 
+        // Store the new player data
+        Dictionary<string, Vector3> newPlayerPositions = new Dictionary<string, Vector3>();
+        Dictionary<string, string> newPlayerTeams = new Dictionary<string, string>();
+
         foreach (var player in allPlayers)
         {
             string playerName = player.First["name"]?.ToString();
-            string team = player.First["team"]?.ToString() ?? "No team assigned yet";
-            string stringPosition = player.First["position"]?.ToString();
-            string[] coords = stringPosition.Split(", ");
+            string team = player.First["team"]?.ToString();
+            string positionString = player.First["position"]?.ToString();
+            int currentHealth = player.First["state"]?["health"]?.ToObject<int>() ?? 100; // Get current health
+
+            if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(team) || string.IsNullOrEmpty(positionString))
+                continue;
+
+            string[] coords = positionString.Split(", ");
             float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
             float z_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
             float y_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
             Vector3 position = new Vector3(0.0006f * x_coord - 0.02f, 0.501f, 0.0006f * z_coord - 0.65f);
-            if (team == "CT")
+
+            // Store player data
+            newPlayerPositions[playerName] = position;
+            newPlayerTeams[playerName] = team;
+
+            // Check for health
+            if (previousPlayerHealth.ContainsKey(playerName))
             {
-                cterroristsPositions[playerName] = position; // Add to the dictionary
+                int previousHealth = previousPlayerHealth[playerName];
+                if (currentHealth < previousHealth)
+                {
+                    // Player damaged
+                    if (playerGameObjects.ContainsKey(playerName))
+                    {
+                        GameObject playerObject = playerGameObjects[playerName];
+                        Debug.Log("Player hit: " + playerName);
+                        StartCoroutine(FlashColor(playerObject));
+                    }
+                }
             }
 
-            else if (team == "T")
+            previousPlayerHealth[playerName] = currentHealth;
+
+            // Check if the player is dead
+            if (currentHealth <= 0)
             {
-                terroristsPositions[playerName] = position;
+                // If player died
+                playerAliveState[playerName] = false;
+
+                if (playerGameObjects.ContainsKey(playerName))
+                {
+                    GameObject playerObject = playerGameObjects[playerName];
+                    playerObject.SetActive(false); // Hide the player object
+                }
             }
-            
+            else
+            {
+                playerAliveState[playerName] = true;
+            }
+        }
+
+        // Remove old players who are not in the new data
+        var playersToRemove = playerGameObjects.Keys.Except(newPlayerPositions.Keys).ToList();
+        foreach (string playerName in playersToRemove)
+        {
+            Destroy(playerGameObjects[playerName]);
+            playerGameObjects.Remove(playerName);
+            previousPlayerHealth.Remove(playerName);
+            playerAliveState.Remove(playerName);
+        }
+
+        // Create new players and update existing ones
+        foreach (var kvp in newPlayerPositions)
+        {
+            string playerName = kvp.Key;
+            Vector3 targetPosition = kvp.Value;
+            string team = newPlayerTeams[playerName];
+
+            if (playerGameObjects.ContainsKey(playerName))
+            {
+                // If player already exists, update position
+                GameObject playerObject = playerGameObjects[playerName];
+                playerObject.transform.position = targetPosition;
+
+                // If player is alive set visibility
+                if (playerAliveState[playerName])
+                {
+                    playerObject.SetActive(true);
+                }
+            }
+            else
+            {
+                // If player doesn't exist -> make new player object
+                GameObject prefab = (team == "CT") ? counterTerroristPrefab : terroristPrefab;
+                Transform parent = (team == "CT") ? counterTerroristsParent : terroristsParent;
+
+                GameObject newPlayerObject = Instantiate(prefab, targetPosition, Quaternion.identity, parent);
+                newPlayerObject.name = playerName;
+                playerGameObjects[playerName] = newPlayerObject;
+
+                previousPlayerHealth[playerName] = 100;
+                playerAliveState[playerName] = true;
+            }
         }
     }
-    
 
     void MovePlayers()
     {
-        for (int i = 0; i < cterroristsGameObjects.Count; i++)
+        foreach (var kvp in playerGameObjects)
         {
-            if (i < cterroristsPositions.Count)
-            {
-                string playerName = cterroristsPositions.ElementAt(i).Key; // Get player name
-                if (cterroristsPositions.TryGetValue(playerName, out Vector3 targetPos))
-                {
-                    // Move the player towards the target position
-                    GameObject cterrorist = cterroristsGameObjects[i];
-                    cterrorist.transform.position = Vector3.MoveTowards(cterrorist.transform.position, targetPos, speed * Time.deltaTime);
-                }
-            }
-        }
+            GameObject playerObject = kvp.Value;
+            string playerName = kvp.Key;
 
-        for (int i = 0; i < terroristsGameObjects.Count; i++)
-        {
-            if (i < terroristsPositions.Count)
+            if (playerGameObjects.TryGetValue(playerName, out GameObject obj))
             {
-                string playerName = terroristsPositions.ElementAt(i).Key; // Get player name
-                if (terroristsPositions.TryGetValue(playerName, out Vector3 targetPos))
-                {
-                    // Move the player towards the target position
-                    GameObject terrorist = terroristsGameObjects[i];
-                    terrorist.transform.position = Vector3.MoveTowards(terrorist.transform.position, targetPos, speed * Time.deltaTime);
-                }
+                Vector3 targetPos = obj.transform.position;
+                playerObject.transform.position = Vector3.MoveTowards(playerObject.transform.position, targetPos, speed * Time.deltaTime);
             }
         }
     }
+
+    private System.Collections.IEnumerator FlashColor(GameObject playerObject)
+    {
+        // Player object flashes red when damage taken
+        Renderer renderer = playerObject.GetComponent<Renderer>();
+
+        if (renderer == null)
+            yield break;
+
+        Color originalColor = renderer.material.color;
+        renderer.material.color = damageFlashColor;
+        yield return new WaitForSeconds(flashDuration);
+        renderer.material.color = originalColor;
+    }
 }
+
+
