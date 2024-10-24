@@ -8,15 +8,21 @@ public class PlayerMovement : MonoBehaviour
     public float speed = 0.2f; // Speed for movement
     public GameObject counterTerroristPrefab; // Prefab for Counter-Terrorists
     public GameObject terroristPrefab; // Prefab for Terrorists
+    public Color damageFlashColor = Color.red; // Color to flash when the player takes damage
+    public float flashDuration = 0.2f; // Duration for color flash
 
     // Parent objects for the players under the map in the hierarchy
     public Transform counterTerroristsParent;
     public Transform terroristsParent;
-    
+
     private GSIDataReceiver gsiDataReceiver;
 
     // Dictionary to store player objects based on their name
     private Dictionary<string, GameObject> playerGameObjects = new Dictionary<string, GameObject>();
+    // Dictionary to track each player's previous health
+    private Dictionary<string, int> previousPlayerHealth = new Dictionary<string, int>();
+    // Dictionary to track player alive state
+    private Dictionary<string, bool> playerAliveState = new Dictionary<string, bool>();
 
     void Start()
     {
@@ -68,6 +74,7 @@ public class PlayerMovement : MonoBehaviour
             string playerName = player.First["name"]?.ToString();
             string team = player.First["team"]?.ToString();
             string positionString = player.First["position"]?.ToString();
+            int currentHealth = player.First["state"]?["health"]?.ToObject<int>() ?? 100; // Get current health
 
             if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(team) || string.IsNullOrEmpty(positionString))
                 continue;
@@ -83,6 +90,43 @@ public class PlayerMovement : MonoBehaviour
             // Store player data
             newPlayerPositions[playerName] = position;
             newPlayerTeams[playerName] = team;
+
+            // Check for health drop
+            if (previousPlayerHealth.ContainsKey(playerName))
+            {
+                int previousHealth = previousPlayerHealth[playerName];
+                if (currentHealth < previousHealth)
+                {
+                    // The player has taken damage, flash their color to red
+                    if (playerGameObjects.ContainsKey(playerName))
+                    {
+                        GameObject playerObject = playerGameObjects[playerName];
+                        Debug.Log("Player hit: " + playerName);
+                        StartCoroutine(FlashColor(playerObject));
+                    }
+                }
+            }
+
+            // Update the previous health value
+            previousPlayerHealth[playerName] = currentHealth; // Correctly updating health here
+
+            // Check if the player is dead
+            if (currentHealth <= 0)
+            {
+                // Set player alive state to false and hide the object
+                playerAliveState[playerName] = false;
+
+                if (playerGameObjects.ContainsKey(playerName))
+                {
+                    GameObject playerObject = playerGameObjects[playerName];
+                    playerObject.SetActive(false); // Hide the player object
+                }
+            }
+            else
+            {
+                // Set player alive state to true
+                playerAliveState[playerName] = true;
+            }
         }
 
         // Remove old players who are not in the new data
@@ -91,6 +135,8 @@ public class PlayerMovement : MonoBehaviour
         {
             Destroy(playerGameObjects[playerName]);
             playerGameObjects.Remove(playerName);
+            previousPlayerHealth.Remove(playerName); // Remove health tracking for the removed player
+            playerAliveState.Remove(playerName); // Remove alive state tracking
         }
 
         // Create new players and update existing ones
@@ -105,17 +151,27 @@ public class PlayerMovement : MonoBehaviour
             {
                 GameObject playerObject = playerGameObjects[playerName];
                 playerObject.transform.position = targetPosition;
+
+                // Check if the player is alive to set the visibility
+                if (playerAliveState[playerName])
+                {
+                    playerObject.SetActive(true); // Show the player object if alive
+                }
             }
             // If player doesn't exist, create a new object under the correct parent
             else
             {
                 GameObject prefab = (team == "CT") ? counterTerroristPrefab : terroristPrefab;
                 Transform parent = (team == "CT") ? counterTerroristsParent : terroristsParent;
-                
+
                 // Instantiate under the correct parent
                 GameObject newPlayerObject = Instantiate(prefab, targetPosition, Quaternion.identity, parent);
                 newPlayerObject.name = playerName;
                 playerGameObjects[playerName] = newPlayerObject;
+
+                // Initialize the health tracking for the new player
+                previousPlayerHealth[playerName] = 100; // Correctly initializing health for new players
+                playerAliveState[playerName] = true; // Initialize alive state
             }
         }
     }
@@ -136,4 +192,27 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
+
+    // Coroutine to flash the player's color when they take damage
+    private System.Collections.IEnumerator FlashColor(GameObject playerObject)
+    {
+        Renderer renderer = playerObject.GetComponent<Renderer>();
+
+        if (renderer == null)
+            yield break;
+
+        // Store the original color
+        Color originalColor = renderer.material.color;
+
+        // Change to the damage color (red)
+        renderer.material.color = damageFlashColor;
+
+        // Wait for the duration of the flash
+        yield return new WaitForSeconds(flashDuration);
+
+        // Revert back to the original color
+        renderer.material.color = originalColor;
+    }
 }
+
+
