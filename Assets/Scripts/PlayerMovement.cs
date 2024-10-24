@@ -5,23 +5,16 @@ using System.Linq;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float speed = 0.2f; // Speed for movement
-    public GameObject counterTerroristPrefab; // Prefab for Counter-Terrorists
-    public GameObject terroristPrefab; // Prefab for Terrorists
-    public Color damageFlashColor = Color.red; // Color to flash when the player takes damage
-    public float flashDuration = 0.2f; // Duration for color flash
-
-    // Parent objects for the players under the map in the hierarchy
+    public float speed = 0.2f;
+    public GameObject counterTerroristPrefab;
+    public GameObject terroristPrefab;
+    public Color damageFlashColor = Color.red;
+    public float flashDuration = 0.2f;
     public Transform counterTerroristsParent;
     public Transform terroristsParent;
-
     private GSIDataReceiver gsiDataReceiver;
-
-    // Dictionary to store player objects based on their name
     private Dictionary<string, GameObject> playerGameObjects = new Dictionary<string, GameObject>();
-    // Dictionary to track each player's previous health
     private Dictionary<string, int> previousPlayerHealth = new Dictionary<string, int>();
-    // Dictionary to track player alive state
     private Dictionary<string, bool> playerAliveState = new Dictionary<string, bool>();
 
     void Start()
@@ -34,13 +27,11 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        // Subscribe to the data update event
         gsiDataReceiver.OnDataReceived += UpdatePlayers;
     }
 
     private void OnDestroy()
     {
-        // Unsubscribe from the data update event
         if (gsiDataReceiver != null)
         {
             gsiDataReceiver.OnDataReceived -= UpdatePlayers;
@@ -49,14 +40,11 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // Move players every frame
         MovePlayers();
     }
 
-    // Updates player positions and creates/destroys objects if necessary
     void UpdatePlayers(string jsonData)
     {
-        // Parse the received data
         JObject data = JObject.Parse(jsonData);
         var allPlayers = data["allplayers"];
 
@@ -65,7 +53,7 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        // Store the new player data in a temporary dictionary
+        // Store the new player data
         Dictionary<string, Vector3> newPlayerPositions = new Dictionary<string, Vector3>();
         Dictionary<string, string> newPlayerTeams = new Dictionary<string, string>();
 
@@ -83,21 +71,19 @@ public class PlayerMovement : MonoBehaviour
             float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
             float z_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
             float y_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
-
-            // Apply scaling to the coordinates
             Vector3 position = new Vector3(0.0006f * x_coord - 0.02f, 0.501f, 0.0006f * z_coord - 0.65f);
 
             // Store player data
             newPlayerPositions[playerName] = position;
             newPlayerTeams[playerName] = team;
 
-            // Check for health drop
+            // Check for health
             if (previousPlayerHealth.ContainsKey(playerName))
             {
                 int previousHealth = previousPlayerHealth[playerName];
                 if (currentHealth < previousHealth)
                 {
-                    // The player has taken damage, flash their color to red
+                    // Player damaged
                     if (playerGameObjects.ContainsKey(playerName))
                     {
                         GameObject playerObject = playerGameObjects[playerName];
@@ -107,13 +93,12 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
 
-            // Update the previous health value
-            previousPlayerHealth[playerName] = currentHealth; // Correctly updating health here
+            previousPlayerHealth[playerName] = currentHealth;
 
             // Check if the player is dead
             if (currentHealth <= 0)
             {
-                // Set player alive state to false and hide the object
+                // If player died
                 playerAliveState[playerName] = false;
 
                 if (playerGameObjects.ContainsKey(playerName))
@@ -124,7 +109,6 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                // Set player alive state to true
                 playerAliveState[playerName] = true;
             }
         }
@@ -135,8 +119,8 @@ public class PlayerMovement : MonoBehaviour
         {
             Destroy(playerGameObjects[playerName]);
             playerGameObjects.Remove(playerName);
-            previousPlayerHealth.Remove(playerName); // Remove health tracking for the removed player
-            playerAliveState.Remove(playerName); // Remove alive state tracking
+            previousPlayerHealth.Remove(playerName);
+            playerAliveState.Remove(playerName);
         }
 
         // Create new players and update existing ones
@@ -146,37 +130,34 @@ public class PlayerMovement : MonoBehaviour
             Vector3 targetPosition = kvp.Value;
             string team = newPlayerTeams[playerName];
 
-            // If player already exists, update position
             if (playerGameObjects.ContainsKey(playerName))
             {
+                // If player already exists, update position
                 GameObject playerObject = playerGameObjects[playerName];
                 playerObject.transform.position = targetPosition;
 
-                // Check if the player is alive to set the visibility
+                // If player is alive set visibility
                 if (playerAliveState[playerName])
                 {
-                    playerObject.SetActive(true); // Show the player object if alive
+                    playerObject.SetActive(true);
                 }
             }
-            // If player doesn't exist, create a new object under the correct parent
             else
             {
+                // If player doesn't exist -> make new player object
                 GameObject prefab = (team == "CT") ? counterTerroristPrefab : terroristPrefab;
                 Transform parent = (team == "CT") ? counterTerroristsParent : terroristsParent;
 
-                // Instantiate under the correct parent
                 GameObject newPlayerObject = Instantiate(prefab, targetPosition, Quaternion.identity, parent);
                 newPlayerObject.name = playerName;
                 playerGameObjects[playerName] = newPlayerObject;
 
-                // Initialize the health tracking for the new player
-                previousPlayerHealth[playerName] = 100; // Correctly initializing health for new players
-                playerAliveState[playerName] = true; // Initialize alive state
+                previousPlayerHealth[playerName] = 100;
+                playerAliveState[playerName] = true;
             }
         }
     }
 
-    // Moves players to their target positions
     void MovePlayers()
     {
         foreach (var kvp in playerGameObjects)
@@ -184,7 +165,6 @@ public class PlayerMovement : MonoBehaviour
             GameObject playerObject = kvp.Value;
             string playerName = kvp.Key;
 
-            // Get the target position from the current player data
             if (playerGameObjects.TryGetValue(playerName, out GameObject obj))
             {
                 Vector3 targetPos = obj.transform.position;
@@ -193,24 +173,17 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Coroutine to flash the player's color when they take damage
     private System.Collections.IEnumerator FlashColor(GameObject playerObject)
     {
+        // Player object flashes red when damage taken
         Renderer renderer = playerObject.GetComponent<Renderer>();
 
         if (renderer == null)
             yield break;
 
-        // Store the original color
         Color originalColor = renderer.material.color;
-
-        // Change to the damage color (red)
         renderer.material.color = damageFlashColor;
-
-        // Wait for the duration of the flash
         yield return new WaitForSeconds(flashDuration);
-
-        // Revert back to the original color
         renderer.material.color = originalColor;
     }
 }
