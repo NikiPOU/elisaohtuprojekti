@@ -1,17 +1,20 @@
 import urllib.request
 import urllib.error
+import json
+from gsi_processor import DataProcessor
 
 class DataReceiver:
-    def __init__(self, uri):
-        self.uri = uri
+    def __init__(self):
         self.gsi_data = None
+        self.data_processor = DataProcessor()
 
-    def get_gsi_data(self):
+    def get_gsi_data(self, uri):
         while True:
             try:
-                request_result = urllib.request.urlopen(self.uri)
+                request_result = urllib.request.urlopen(uri)
                 self.gsi_data = request_result.read()
-                print(self.gsi_data)
+                all_player_data = json.loads(self.gsi_data)
+                self.data_processor.parse_movement_data_live(all_player_data)
 
             except urllib.error.URLError:
                 print("Error: Cannot connect to requested server")
@@ -24,5 +27,5 @@ class DataReceiver:
 
 
 if __name__ == "__main__":
-    receiver = DataReceiver("http://localhost:3000/data")
-    receiver.get_gsi_data()
+    receiver = DataReceiver()
+    receiver.get_gsi_data("http://localhost:3000/data")
