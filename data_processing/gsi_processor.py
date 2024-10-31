@@ -1,20 +1,21 @@
 import json
+from gsi_encoding import DataEncoding
 
 class DataProcessor:
     def __init__(self):
         self.player_positions = {}
         self.statistics_data = []
+        self.data_encoder = DataEncoding()
 
-    def parse_movement_data_live(self, all_player_data): # Gets player name and position from data and adds the to a dictionary
+    def parse_movement_data_live(self, all_player_data): # Gets player name and position from data and adds them to a dictionary
         try:
             players = all_player_data["allplayers"]
             for id, player in players.items():
                 name = player["name"]
                 position = player["position"]
                 self.player_positions[name] = position
-                json_positions = json.dumps(self.player_positions)
-                with open("gsi/player_positions.json", "w") as file:
-                    file.write(json_positions)
+
+                self.data_encoder.create_json_file(self.player_positions, "player_positions.json")
         except KeyError:
             pass
 
@@ -32,9 +33,7 @@ class DataProcessor:
                 player_stats = (f"Name: {name} | Team: {team} | Health: {health} | Kills: {kills} | Assists: {assists} | Deaths: {deaths}")
                 self.statistics_data.append(player_stats)
 
-                json_statistics = json.dumps(self.statistics_data)
-                with open("gsi/statistics.json", "w") as file:
-                    file.write(json_statistics)
+                self.data_encoder.create_json_file(self.statistics_data, "statistics.json")
         except KeyError:
             pass
 
