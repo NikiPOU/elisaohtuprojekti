@@ -15,6 +15,7 @@ class DataReceiver:
                 self.gsi_data = request_result.read()
                 all_player_data = json.loads(self.gsi_data)
                 self.data_processor.parse_movement_data_live(all_player_data)
+                self.data_processor.parse_statistics_live(all_player_data)
 
             except urllib.error.URLError:
                 print("Error: Cannot connect to requested server")
