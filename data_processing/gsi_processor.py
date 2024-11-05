@@ -1,4 +1,3 @@
-import json
 from gsi_encoding import DataEncoding
 
 class DataProcessor:
@@ -10,7 +9,7 @@ class DataProcessor:
     def parse_movement_data_live(self, all_player_data): # Gets player name and position from data and adds them to a dictionary
         try:
             players = all_player_data["allplayers"]
-            for id, player in players.items():
+            for _, player in players.items():
                 name = player["name"]
                 position = player["position"]
                 self.player_positions[name] = position
@@ -22,7 +21,7 @@ class DataProcessor:
     def parse_statistics_live(self, all_player_data): # Gets relevant player statistics, converts them to string and adds the string to list
         try:
             players = all_player_data["allplayers"]
-            for id, player in players.items():
+            for _, player in players.items():
                 name = player["name"]
                 team = player["team"]
                 health = player["state"]["health"]
