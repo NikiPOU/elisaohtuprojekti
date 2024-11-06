@@ -9,10 +9,17 @@ def create_database():
 
     database_uri = f"postgresql://{DATABASE_USERNAME}:{DATABASE_PASSWORD}@{DATABASE_URL}:{DATABASE_PORT}"
 
-    engine = create_engine(database_uri)
+    engine = create_engine(
+        database_uri,
+        isolation_level="Autocommit"
+        )
 
     try: 
+        with open("schema.sql", "r") as file:
+            schema = file.read()
+
         with engine.connect() as connection:
+            connection.execute(text(schema))
             sql = text("SELECT version();")
             result = connection.execute(sql)
             version = result.fetchone()
