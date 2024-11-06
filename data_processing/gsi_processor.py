@@ -1,12 +1,12 @@
 from gsi_encoding import DataEncoding
+from database_updator import DatabaseUpdator
 
 class DataProcessor:
     def __init__(self):
         self.player_positions = {}
         self.statistics_data = []
         self.data_encoder = DataEncoding()
-
-    def parse_movement_data_live(self, all_player_data): # Gets player name and position from data and adds them to a dictionary
+        self.database_updator = DatabaseUpdator()
         try:
             players = all_player_data["allplayers"]
             for _, player in players.items():
@@ -28,11 +28,7 @@ class DataProcessor:
                 kills = player["match_stats"]["kills"]
                 assists = player["match_stats"]["assists"]
                 deaths = player["match_stats"]["deaths"]
-            
-                player_stats = (f"Name: {name} | Team: {team} | Health: {health} | Kills: {kills} | Assists: {assists} | Deaths: {deaths}")
-                self.statistics_data.append(player_stats)
-
-                self.data_encoder.create_json_file(self.statistics_data, "statistics.json")
+            self.database_updator.update_database(self.game_data)
         except KeyError:
             pass
 

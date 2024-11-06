@@ -24,5 +24,8 @@ def create_database():
             result = connection.execute(sql)
             version = result.fetchone()
             print(f"Connected to PostgreSQL, version: {version[0]}")
+
+        return engine.connect()
+    
     except Exception as e:
         print(e)
