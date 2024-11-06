@@ -74,3 +74,4 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # This .gitignore file is provided under the CC0 1.0 Universal (Public Domain Dedication)
+.env
