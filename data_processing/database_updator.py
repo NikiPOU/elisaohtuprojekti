@@ -16,12 +16,12 @@ class DatabaseUpdator:
             deaths = player_data["deaths"]
             sql = text("INSERT INTO players_test (steamid, username, kills, deaths) VALUES (:steam_id, :username, :kills, :deaths)")
         
-        self.connection.execute(
-            sql, {
-                "steam_id": steam_id,
-                "username": username,
-                "kills": kills,
-                "deaths": deaths
-            }
-        )
-        self.connection.commit()
+            self.connection.execute(
+                sql, {
+                    "steam_id": steam_id,
+                    "username": username,
+                    "kills": kills,
+                    "deaths": deaths
+                }
+            )
+            self.connection.commit()

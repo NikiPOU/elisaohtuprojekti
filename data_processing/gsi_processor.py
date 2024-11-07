@@ -3,7 +3,7 @@ from database_updator import DatabaseUpdator
 
 class DataProcessor:
     def __init__(self):
-        self.game_data = {}
+        self.game_data = {"player_data": {}, "match_data": {}}
         self.data_encoder = DataEncoding()
         self.database_updator = DatabaseUpdator()
     
