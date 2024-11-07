@@ -1,11 +1,9 @@
 from sqlalchemy import text
-from db import create_database
 
 class DatabaseUpdator:
     def __init__(self):
         # Tässä saadaan tietokantayhteys, mutta pitäisi toteuttaa toisella tavalla niin, ettei koko metodia kutsuta "uudelleen"
-
-        self.connection = self.create_database()
+        pass
 
     def update_database(self, data: dict):
         # Tässä testaus testitaululle datan lisäämisestä jollain arvoilla
