@@ -1,4 +1,4 @@
-# Retro 1
+# Retro (sprint 1)
 
 ## Start:
 - Tehdään skriptejä tehdessä niihin myös testit 

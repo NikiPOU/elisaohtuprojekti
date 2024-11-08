@@ -1,4 +1,4 @@
-# Retro 4
+# Retro (sprint 3)
 
 ## Start
 
@@ -13,7 +13,7 @@
 - Liikaa yhteen taskiin jumittuminen. Need help kanavalle viesti, backlogissa taski "need help" kohtaan ja ala työstämään toista taskia.
 - Backlogin päivittäminen.
 
-- ## Continue
+## Continue
   
 - Jatketaan live development kanavan käyttöä.
 - Avun kysyminen.

@@ -1,4 +1,4 @@
-# Retro 1
+# Retro (sprint 2)
 
 ## Start:
 - Käydään uudet toiminnallisuudet yhdessä läpi
