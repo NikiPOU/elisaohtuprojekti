@@ -1,5 +1,7 @@
 ```mermaid
 classDiagram
+    class Main
+
     class App
 
     class Database
@@ -20,11 +22,13 @@ classDiagram
     DataEncoding : +create_json_file(data)
     DataEncoding : +write_json_file(data, file_name)
 
-    App --> Database
-    DataReceiver --> DataProcessor
-    Main --> DataReceiver
     Main --> App
+    Main --> DataReceiver
+    App --> Database
+    DatabaseUpdator --> Database
+    DataReceiver --> DataProcessor
     DataProcessor --> DataEncoding
     DataProcessor --> DatabaseUpdator
+    Database --> DatabaseHandler
     DatabaseHandler --> DataEncoding
 ```
