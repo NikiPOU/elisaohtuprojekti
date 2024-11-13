@@ -1,8 +1,8 @@
 ```mermaid
 classDiagram
-    class Main
-
     class App
+
+    class Database
 
     class DataReceiver
     DataReceiver : -latest_data
@@ -20,6 +20,7 @@ classDiagram
     DataEncoding : +create_json_file(data)
     DataEncoding : +write_json_file(data, file_name)
 
+    App --> Database
     DataReceiver --> DataProcessor
     Main --> DataReceiver
     Main --> App
