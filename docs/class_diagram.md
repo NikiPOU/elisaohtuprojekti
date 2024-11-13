@@ -6,20 +6,19 @@ classDiagram
 
     class DataReceiver
     DataReceiver : -latest_data
-    DataReceiver : +get_gsi_data(uri)
-    DataReceiver : +return_gsi_data()
+    DataReceiver : +get_gsi_data(data)
 
     class DataProcessor
-    DataProcessor : +parse_movement_data_live(all_player_data)
-    DataProcessor : +parse_statistics_live(all_player_data)
-    DataProcessor : +parse_utility_live(all_player_data)
+    DataProcessor : +parse_data(data)
 
     class DatabaseUpdator
+    DatabaseUpdator : +update_database(data)
 
     class DatabaseHandler
 
     class DataEncoding
-    DataEncoding : +create_json_file(data, file_name)
+    DataEncoding : +create_json_file(data)
+    DataEncoding : +write_json_file(data, file_name)
 
     DataReceiver --> DataProcessor
     Main --> DataReceiver
