@@ -17,7 +17,7 @@ public class WsClient : MonoBehaviour
 
         ws.OnMessage += (sender, e) =>
         {
-            Debug.Log("Message received from " + ((WebSocket)sender).Url + ", Data: " + e.Data);
+            Debug.Log("Received JSON data: " + e.Data);
         };
 
         ws.OnError += (sender, e) =>
