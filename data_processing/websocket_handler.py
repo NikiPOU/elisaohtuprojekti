@@ -5,20 +5,16 @@ import os
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-# Path to the player data file
 file_path = 'player_positions.json'
 connected_clients = set()
 
-# WebSocket handler to manage connections and send data
-async def handler(websocket, path='/'):  # Accept `path` even if unused
+async def handler(websocket, path='/'):
     # Register new client
     connected_clients.add(websocket)
     try:
-        # Keep the connection open
         async for message in websocket:
             print(f"Received message from client: {message}")
     finally:
-        # Unregister client on disconnect
         connected_clients.remove(websocket)
 
 # Function to broadcast data to all connected clients
@@ -27,7 +23,7 @@ async def broadcast_data(data):
         message = json.dumps(data)
         await asyncio.wait([client.send(message) for client in connected_clients])
 
-# Event handler to detect changes to player_data.json
+# Event handler to detect changes to json files
 class FileChangeHandler(FileSystemEventHandler):
     def __init__(self, loop):
         super().__init__()
@@ -42,7 +38,6 @@ class FileChangeHandler(FileSystemEventHandler):
 
 # Main function to start the server and file watcher
 async def main():
-    # Set up WebSocket server
     async with websockets.serve(handler, "0.0.0.0", 8080):
         print("WebSocket server started on ws://localhost:8080")
 
@@ -53,12 +48,10 @@ async def main():
         observer.schedule(event_handler, path='.', recursive=False)
         observer.start()
 
-        # Keep the server running
         try:
             await asyncio.Future()
         finally:
             observer.stop()
             observer.join()
 
-# Run the server
 asyncio.run(main())
