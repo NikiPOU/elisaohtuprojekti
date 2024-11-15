@@ -1,4 +1,5 @@
 from sqlalchemy import text
+from db import db
 
 class DatabaseUpdator:
     def __init__(self):
@@ -12,9 +13,9 @@ class DatabaseUpdator:
             username = player_data["name"]
             kills = player_data["kills"]
             deaths = player_data["deaths"]
-            sql = text("INSERT INTO players_test (steamid, username, kills, deaths) VALUES (:steam_id, :username, :kills, :deaths)")
-        
-            self.connection.execute(
+            sql = text("INSERT INTO players_test (steamid, username, kills, deaths) VALUES (:steam_id, :username, :kills, :deaths) ON CONFLICT (steamid) DO UPDATE SET kills = :kills, deaths = :deaths")
+
+            db.session.execute(
                 sql, {
                     "steam_id": steam_id,
                     "username": username,
@@ -22,4 +23,4 @@ class DatabaseUpdator:
                     "deaths": deaths
                 }
             )
-            self.connection.commit()
+            db.session.commit()

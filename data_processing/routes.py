@@ -1,7 +1,8 @@
-from app import app, data_receiver
+from app import app
 from flask import request, jsonify
+from gsi_data_receiver import DataReceiver
 
-database_initialized = False
+data_receiver = DataReceiver()
 
 @app.route('/', methods=['POST'])
 def receive_data():
@@ -12,3 +13,4 @@ def receive_data():
     except Exception as e:
         print(f"Error processing data: {e}")
         return jsonify(status="error", error=str(e)), 500
+

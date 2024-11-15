@@ -5,5 +5,6 @@ CREATE TABLE players_test (
     steamid TEXT,
     username TEXT,
     kills INT,
-    deaths INT
+    deaths INT,
+    UNIQUE (steamid)
 );
