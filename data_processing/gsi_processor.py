@@ -1,10 +1,11 @@
 from gsi_encoding import DataEncoding
+from websocket_handler import WebSocketHandler
 from database_updator import DatabaseUpdator
 
 class DataProcessor:
-    def __init__(self):
+    def __init__(self, websocket_handler: WebSocketHandler):
         self.game_data = {"player_data": {}, "match_data": {}}
-        self.data_encoder = DataEncoding()
+        self.data_encoder = DataEncoding(websocket_handler)
         self.database_updator = DatabaseUpdator()
     
     def parse_data(self, data: dict):
