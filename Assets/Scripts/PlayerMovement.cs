@@ -7,16 +7,17 @@ using System;
 public class PlayerMovement : MonoBehaviour
 {
     public float speed = 0.2f;
-    public Transform map;
     public GameObject counterTerroristPrefab;
     public GameObject terroristPrefab;
+    public Transform parent;
     public Color damageFlashColor = Color.red;
     public float flashDuration = 0.2f;
+    [NonSerialized] public Transform counterTerroristsParent;
+    [NonSerialized] public Transform terroristsParent;
     private GSIDataReceiver gsiDataReceiver;
     private Dictionary<string, GameObject> playerGameObjects = new Dictionary<string, GameObject>();
     private Dictionary<string, int> previousPlayerHealth = new Dictionary<string, int>();
     private Dictionary<string, bool> playerAliveState = new Dictionary<string, bool>();
-    private Dictionary<string, Vector3> newPlayerPositions = new Dictionary<string, Vector3>();
 
     void Start()
     {
@@ -55,7 +56,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Store the new player data
-        //Dictionary<string, Vector3> newPlayerPositions = new Dictionary<string, Vector3>();
+        Dictionary<string, Vector3> newPlayerPositions = new Dictionary<string, Vector3>();
         Dictionary<string, string> newPlayerTeams = new Dictionary<string, string>();
 
         foreach (var player in allPlayers)
@@ -72,8 +73,7 @@ public class PlayerMovement : MonoBehaviour
             float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
             float z_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
             float y_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
-            //Vector3 position = new Vector3(0.0006f * x_coord - 0.02f, 0.501f, 0.0006f * z_coord - 0.65f);
-            Vector3 position = new Vector3( 0f,0f, 0f);
+            Vector3 position = new Vector3(0.00065f * x_coord - 2.97f, 0.00065f * z_coord + 1.3f, 2.95f);
 
             // Store player data
             newPlayerPositions[playerName] = position;
@@ -126,7 +126,6 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Create new players and update existing ones
-        //kvp = key value pair joka sisältää pelaajan nimen ja sen uuden koordinaatin
         foreach (var kvp in newPlayerPositions)
         {
             string playerName = kvp.Key;
@@ -137,7 +136,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 // If player already exists, update position
                 GameObject playerObject = playerGameObjects[playerName];
-                //playerObject.transform.position = targetPosition;
+                playerObject.transform.position = targetPosition;
 
                 // If player is alive set visibility
                 if (playerAliveState[playerName])
@@ -149,11 +148,10 @@ public class PlayerMovement : MonoBehaviour
             {
                 // If player doesn't exist -> make new player object
                 GameObject prefab = (team == "CT") ? counterTerroristPrefab : terroristPrefab;
-                Transform parent = map;
-                
-               
-                GameObject newPlayerObject = Instantiate(prefab, targetPosition, parent.localRotation, parent);
-                newPlayerObject.transform.localPosition = targetPosition;
+                //Transform parent = (team == "CT") ? counterTerroristsParent : terroristsParent;
+
+                GameObject newPlayerObject = Instantiate(prefab, parent, false);
+                newPlayerObject.transform.position = targetPosition;
                 newPlayerObject.name = playerName;
                 playerGameObjects[playerName] = newPlayerObject;
 
@@ -170,13 +168,13 @@ public class PlayerMovement : MonoBehaviour
             GameObject playerObject = kvp.Value;
             string playerName = kvp.Key;
 
-            if (newPlayerPositions.TryGetValue(playerName, out Vector3 position))
+            if (playerGameObjects.TryGetValue(playerName, out GameObject obj))
             {
-                Vector3 targetPos = position;
+                Vector3 targetPos = obj.transform.position;
                 playerObject.transform.position = Vector3.MoveTowards(playerObject.transform.position, targetPos, speed * Time.deltaTime);
             }
         }
-    }//Vector3 local_target = world_target - parent_object.transform.position;
+    }
 
     private System.Collections.IEnumerator FlashColor(GameObject playerObject)
     {
@@ -192,5 +190,3 @@ public class PlayerMovement : MonoBehaviour
         renderer.material.color = originalColor;
     }
 }
-
-
