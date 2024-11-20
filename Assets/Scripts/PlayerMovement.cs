@@ -73,7 +73,7 @@ public class PlayerMovement : MonoBehaviour
             float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
             float z_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
             float y_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
-            Vector3 position = new Vector3(0.00063f * x_coord, 0.00063f * z_coord - 0.7f, -0.05f) + parent.position;
+            Vector3 position = new Vector3(0.00059f * x_coord + 0.1f, 0.00059f * z_coord - 0.6f, -0.05f) + parent.position;
 
             // Store player data
             newPlayerPositions[playerName] = position;
