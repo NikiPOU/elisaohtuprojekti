@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
     public float speed = 0.2f;
     public GameObject counterTerroristPrefab;
     public GameObject terroristPrefab;
+    public Transform parent;
     public Color damageFlashColor = Color.red;
     public float flashDuration = 0.2f;
     [NonSerialized] public Transform counterTerroristsParent;
@@ -72,7 +73,7 @@ public class PlayerMovement : MonoBehaviour
             float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
             float z_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
             float y_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
-            Vector3 position = new Vector3(0.0006f * x_coord - 0.02f, 0.501f, 0.0006f * z_coord - 0.65f);
+            Vector3 position = new Vector3(0.00059f * x_coord + 0.1f, 0.00059f * z_coord - 0.6f, -0.05f) + parent.position;
 
             // Store player data
             newPlayerPositions[playerName] = position;
@@ -147,9 +148,10 @@ public class PlayerMovement : MonoBehaviour
             {
                 // If player doesn't exist -> make new player object
                 GameObject prefab = (team == "CT") ? counterTerroristPrefab : terroristPrefab;
-                Transform parent = (team == "CT") ? counterTerroristsParent : terroristsParent;
+                //Transform parent = (team == "CT") ? counterTerroristsParent : terroristsParent;
 
-                GameObject newPlayerObject = Instantiate(prefab, targetPosition, Quaternion.identity, parent);
+                GameObject newPlayerObject = Instantiate(prefab, parent, false);
+                newPlayerObject.transform.position = targetPosition;
                 newPlayerObject.name = playerName;
                 playerGameObjects[playerName] = newPlayerObject;
 
@@ -188,5 +190,3 @@ public class PlayerMovement : MonoBehaviour
         renderer.material.color = originalColor;
     }
 }
-
-
