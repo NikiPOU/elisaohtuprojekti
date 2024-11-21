@@ -34,14 +34,14 @@ public class HeatMapPlayerMovement : MonoBehaviour
             return;
         }
 
-        gsiDataReceiver.OnDataReceived += UpdateTargetPosition;
+        gsiDataReceiver.OnPositionsDataReceived += UpdateTargetPosition;
     }
 
     private void OnDestroy()
     {
         if (gsiDataReceiver != null)
         {
-            gsiDataReceiver.OnDataReceived -= UpdateTargetPosition;
+            gsiDataReceiver.OnPositionsDataReceived -= UpdateTargetPosition;
         }
     }
 
@@ -84,7 +84,7 @@ public class HeatMapPlayerMovement : MonoBehaviour
         if (gsiDataReceiver != null)
         {
             // Update the target position based on the parsed GSI data
-            position = ParseGSI(gsiDataReceiver.gsiData);
+            position = ParseGSI(gsiDataReceiver.positionsData);
             Debug.Log("Updated player position: " + position);
         }
         LeaveTrace(); // Leave trace after updating the position
@@ -92,20 +92,21 @@ public class HeatMapPlayerMovement : MonoBehaviour
 
     Vector3 ParseGSI(string jsonData)
     {
-        JObject data = JObject.Parse(jsonData); // Parse JSON using Newtonsoft
-        var allPlayers = data["allplayers"];
+        JObject allPlayers = JObject.Parse(jsonData); // Parse JSON using Newtonsoft
         if (allPlayers == null || playerName == null)
         {
-            Debug.Log("playername null");
+            Debug.Log("Playernames null");
             return position;
         }
 
-        foreach (var player in allPlayers)
+        foreach (var property in ((JObject)allPlayers).Properties())
         {
-            string name = player.First["name"]?.ToString();
+            JArray playerData = (JArray)property.Value;
+            string name = playerData[1]?.ToString();
             if (name == playerName)
             {
-                string stringPosition = player.First["position"]?.ToString();
+                string stringPosition = playerData[0]?.ToString();
+                Debug.Log("Pos: " + stringPosition);
                 if (!string.IsNullOrEmpty(stringPosition))
                 {
                     string[] coords = stringPosition.Split(", ");

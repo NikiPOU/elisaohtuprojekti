@@ -5,14 +5,27 @@ using UnityEngine.Networking;
 
 public class GSIDataReceiver : MonoBehaviour
 {
-    public string gsiData; //UUTTA tähän muuttujaan talletetaan gsi dataa
-    public event Action<string> OnDataReceived;
+    public string statisticsData; // Stores data from the first address
+    public string positionsData; // Stores data from the second address
+
+    public event Action<string> OnStatisticsDataReceived; // Event for the first data source
+    public event Action<string> OnPositionsDataReceived; // Event for the second data source
+
     private void Start()
     {
-        StartCoroutine(GetGSIData("http://localhost:3000/data"));   // Kovakoodattuna portti 3000 väliaikaisesti
+        // Start coroutines for each endpoint
+        StartCoroutine(GetGSIData("https://gsi-ohtuprojekti-staging.apps.ocp-test-0.k8s.it.helsinki.fi/statistics", data => {
+            statisticsData = data;
+            OnStatisticsDataReceived?.Invoke(statisticsData); // Invoke event for the first data
+        }));
+
+        StartCoroutine(GetGSIData("https://gsi-ohtuprojekti-staging.apps.ocp-test-0.k8s.it.helsinki.fi/player_positions", data => {
+            positionsData = data;
+            OnPositionsDataReceived?.Invoke(positionsData); // Invoke event for the second data
+        }));
     }
 
-    private IEnumerator GetGSIData(string uri)
+    private IEnumerator GetGSIData(string uri, Action<string> onDataReceived)
     {
         while (true)
         {
@@ -20,22 +33,22 @@ public class GSIDataReceiver : MonoBehaviour
             {
                 yield return webRequest.SendWebRequest();
 
-                // Jos Error -> printtaa sen Unity terminaaliin
+                // Handle any errors
                 if (webRequest.result == UnityWebRequest.Result.ConnectionError || 
                     webRequest.result == UnityWebRequest.Result.ProtocolError)
                 {
-                    Debug.Log("Error: " + webRequest.error);
+                    Debug.Log("Error fetching data from " + uri + ": " + webRequest.error);
                 }
                 else
                 {
-                    gsiData = webRequest.downloadHandler.text; //gsiData muuttujaan talletetaan haettu data
-                    // Printtaa GSI Datan Unity terminaaliin
-                    Debug.Log("GSI Data: " + webRequest.downloadHandler.text);
-                    OnDataReceived?.Invoke(gsiData);
+                    string data = webRequest.downloadHandler.text; // Get the downloaded data
+                    Debug.Log($"Data from {uri}: {data}");
+                    onDataReceived?.Invoke(data); // Pass the data to the callback
                 }
             }
 
-            yield return new WaitForSeconds(0.1f); // Odotus
+            yield return new WaitForSeconds(0.1f); // Wait before the next request
         }
     }
 }
+

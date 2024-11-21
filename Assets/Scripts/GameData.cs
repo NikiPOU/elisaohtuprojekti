@@ -37,14 +37,14 @@ public class Statistics : MonoBehaviour
             return; //Exit if GSI data receiver is nout found
         }
 
-        gsiDataReceiver.OnDataReceived += StatisticsUpdate;
+        gsiDataReceiver.OnStatisticsDataReceived += StatisticsUpdate;
     }
 
     private void OnDestroy()
     {
         if (gsiDataReceiver != null)
         {
-            gsiDataReceiver.OnDataReceived -= StatisticsUpdate;
+            gsiDataReceiver.OnStatisticsDataReceived -= StatisticsUpdate;
         }
     }
 
@@ -53,15 +53,14 @@ public class Statistics : MonoBehaviour
         if (gsiDataReceiver != null && text != null)
         {
             // Extract important data from GSI and update the display text
-            string important = ParseGSI(gsiDataReceiver.gsiData);
+            string important = ParseGSI(gsiDataReceiver.statisticsData);
             text.text = important; // Update the UI with server data
         }
     }
 
     string ParseGSI(string jsonData)
     {
-        JObject data = JObject.Parse(jsonData); // Parse JSON using Newtonsoft
-        var allPlayers = data["allplayers"];
+        JObject allPlayers = JObject.Parse(jsonData); // Parse JSON using Newtonsoft
         if (allPlayers == null)
         {
             return "No players found.";
@@ -69,21 +68,28 @@ public class Statistics : MonoBehaviour
 
         List<string> playerDetails = new List<string>();
 
-        foreach (var player in allPlayers)
+        // Iterate over the properties of allPlayers
+        foreach (var property in ((JObject)allPlayers).Properties())
         {
-            string playerName = player.First["name"]?.ToString();
-            string team = player.First["team"]?.ToString() ?? "No team assigned yet";
-            int health = player.First["state"]?["health"]?.ToObject<int>() ?? 0;
-            int kills = player.First["match_stats"]?["kills"]?.ToObject<int>() ?? 0;
-            int assists = player.First["match_stats"]?["assists"]?.ToObject<int>() ?? 0;
-            int deaths = player.First["match_stats"]?["deaths"]?.ToObject<int>() ?? 0;
+            string steamId = property.Name; // Access the key (Steam ID)
+            JArray playerData = (JArray)property.Value; // Access the value (player data array)
 
+            // Extract details from the array
+            string playerName = playerData[0]?.ToString() ?? "Unknown";
+            string team = playerData[1]?.ToString() ?? "No Team";
+            int health = playerData[2]?.ToObject<int>() ?? 0;
+            int kills = playerData[3]?.ToObject<int>() ?? 0;
+            int assists = playerData[4]?.ToObject<int>() ?? 0;
+            int deaths = playerData[5]?.ToObject<int>() ?? 0;
+
+            // Format the data
             string handledData = $"Player: {playerName} | " +
-                                $"Team: {team} | " +
-                                $"Health: {health} | " +
-                                $"Kills: {kills} | Assists: {assists} | Deaths: {deaths}\n";
+                                $"Team: {team} | Health: {health} | " +
+                                $"Kills: {kills} | Assists: {assists} | Deaths: {deaths}";
+
             playerDetails.Add(handledData);
         }
         return string.Join("\n", playerDetails);
     }
+
 }
