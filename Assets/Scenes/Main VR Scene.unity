@@ -1574,7 +1574,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e0d5da6b56c0c34e9d253d6c10963d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gsiData: 
+  statisticsData: 
+  positionsData: 
 --- !u!1001 &240387795
 PrefabInstance:
   m_ObjectHideFlags: 0

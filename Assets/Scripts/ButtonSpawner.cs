@@ -21,15 +21,15 @@ public class ButtonSpawner : MonoBehaviour
             return;
         }
 
-        gsiDataReceiver.OnDataReceived += StatisticsUpdate;
-        StatisticsUpdate(gsiDataReceiver.gsiData);
+        gsiDataReceiver.OnStatisticsDataReceived += StatisticsUpdate;
+        StatisticsUpdate(gsiDataReceiver.statisticsData);
     }
 
     private void OnDestroy()
     {
         if (gsiDataReceiver != null)
         {
-            gsiDataReceiver.OnDataReceived -= StatisticsUpdate;
+            gsiDataReceiver.OnStatisticsDataReceived -= StatisticsUpdate;
         }
     }
 
@@ -130,8 +130,7 @@ public class ButtonSpawner : MonoBehaviour
     List<string> ParseGSI(string jsonData)
     // Etsii datasta pelaaja nimet listaan
     {
-        JObject data = JObject.Parse(jsonData);
-        var allPlayers = data["allplayers"];
+        JObject allPlayers = JObject.Parse(jsonData);
         if (allPlayers == null)
         {
             Debug.LogError("Pelaajia ei löytynyt datasta.");
@@ -140,9 +139,10 @@ public class ButtonSpawner : MonoBehaviour
 
         List<string> playerDetails = new List<string>();
 
-        foreach (var player in allPlayers)
+        foreach (var property in ((JObject)allPlayers).Properties())
         {
-            string playerName = player.First["name"]?.ToString();
+            JArray playerData = (JArray)property.Value;
+            string playerName = playerData[0]?.ToString();
             if (!string.IsNullOrEmpty(playerName))
             {
                 playerDetails.Add(playerName);
