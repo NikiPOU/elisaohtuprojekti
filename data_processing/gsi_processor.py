@@ -3,14 +3,13 @@ from database_updator import DatabaseUpdator
 
 class DataProcessor:
     def __init__(self):
-        self.game_data = {"player_data": {}, "match_data": {}}
         self.data_encoder = DataEncoding()
         self.database_updator = DatabaseUpdator()
     
     def parse_data(self, data: dict):
         # Tekee gsi-datasta uuden sanakirjan, jossa on vain tarvittava data
-
         try:
+            self.game_data = {"player_data": {}, "match_data": {}}
             players = data["allplayers"]
             for steam_id, player in players.items():
                 name = player["name"]
