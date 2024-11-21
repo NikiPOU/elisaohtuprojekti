@@ -29,14 +29,14 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        gsiDataReceiver.OnDataReceived += UpdatePlayers;
+        gsiDataReceiver.OnPositionsDataReceived += UpdatePlayers;
     }
 
     private void OnDestroy()
     {
         if (gsiDataReceiver != null)
         {
-            gsiDataReceiver.OnDataReceived -= UpdatePlayers;
+            gsiDataReceiver.OnPositionsDataReceived -= UpdatePlayers;
         }
     }
 
@@ -47,8 +47,7 @@ public class PlayerMovement : MonoBehaviour
 
     void UpdatePlayers(string jsonData)
     {
-        JObject data = JObject.Parse(jsonData);
-        var allPlayers = data["allplayers"];
+        JObject allPlayers = JObject.Parse(jsonData);
 
         if (allPlayers == null)
         {
@@ -59,12 +58,14 @@ public class PlayerMovement : MonoBehaviour
         Dictionary<string, Vector3> newPlayerPositions = new Dictionary<string, Vector3>();
         Dictionary<string, string> newPlayerTeams = new Dictionary<string, string>();
 
-        foreach (var player in allPlayers)
+        foreach (var property in ((JObject)allPlayers).Properties())
         {
-            string playerName = player.First["name"]?.ToString();
-            string team = player.First["team"]?.ToString();
-            string positionString = player.First["position"]?.ToString();
-            int currentHealth = player.First["state"]?["health"]?.ToObject<int>() ?? 100; // Get current health
+            JArray playerData = (JArray)property.Value;
+
+            string positionString = playerData[0]?.ToString();
+            string playerName = playerData[1]?.ToString();
+            string team = playerData[2]?.ToString();
+            int currentHealth = playerData[3]?.ToObject<int>() ?? 100; // Get current health
 
             if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(team) || string.IsNullOrEmpty(positionString))
                 continue;
