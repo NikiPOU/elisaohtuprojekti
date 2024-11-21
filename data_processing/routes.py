@@ -1,6 +1,7 @@
 from app import app
 from flask import request, jsonify
 from gsi_data_receiver import DataReceiver
+from json import load
 
 data_receiver = DataReceiver()
 
@@ -18,7 +19,7 @@ def receive_data():
 def get_statistics():
     try:
         with open("statistics.json", "r") as file:
-            statistics = file.read()
+            statistics = load(file)
         return jsonify(statistics), 200
     except Exception as e:
         print(f"Error getting statistics: {e}")
@@ -28,7 +29,7 @@ def get_statistics():
 def get_positions():
     try:
         with open("player_positions.json", "r") as file:
-            statistics = file.read()
+            statistics = load(file)
         return jsonify(statistics), 200
     except Exception as e:
         print(f"Error getting statistics: {e}")
