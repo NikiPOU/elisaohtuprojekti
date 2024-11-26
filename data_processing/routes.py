@@ -34,3 +34,13 @@ def get_positions():
     except Exception as e:
         print(f"Error getting statistics: {e}")
         return jsonify(status="error", error=str(e)), 500
+    
+@app.route('/match_data', methods=['GET'])
+def get_match():
+    try:
+        with open("match_data.json", "r") as file:
+            statistics = load(file)
+        return jsonify(statistics), 200
+    except Exception as e:
+        print(f"Error getting statistics: {e}")
+        return jsonify(status="error", error=str(e)), 500
