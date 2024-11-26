@@ -6,10 +6,10 @@ using System;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float speed = 0.2f;
     public GameObject counterTerroristPrefab;
     public GameObject terroristPrefab;
     public Transform parent;
+    public float lerpDuration = 5;
     public Color damageFlashColor = Color.red;
     public float flashDuration = 0.2f;
     [NonSerialized] public Transform counterTerroristsParent;
@@ -18,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     private Dictionary<string, GameObject> playerGameObjects = new Dictionary<string, GameObject>();
     private Dictionary<string, int> previousPlayerHealth = new Dictionary<string, int>();
     private Dictionary<string, bool> playerAliveState = new Dictionary<string, bool>();
+    private Dictionary<string, Coroutine> playerMoveCoroutines = new Dictionary<string, Coroutine>();
 
     void Start()
     {
@@ -40,11 +41,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        MovePlayers();
-    }
-
     void UpdatePlayers(string jsonData)
     {
         JObject allPlayers = JObject.Parse(jsonData);
@@ -65,7 +61,7 @@ public class PlayerMovement : MonoBehaviour
             string positionString = playerData[0]?.ToString();
             string playerName = playerData[1]?.ToString();
             string team = playerData[2]?.ToString();
-            int currentHealth = playerData[3]?.ToObject<int>() ?? 100; // Get current health
+            int currentHealth = playerData[3]?.ToObject<int>() ?? 100;
 
             if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(team) || string.IsNullOrEmpty(positionString))
                 continue;
@@ -101,7 +97,6 @@ public class PlayerMovement : MonoBehaviour
             // Check if the player is dead
             if (currentHealth <= 0)
             {
-                // If player died
                 playerAliveState[playerName] = false;
 
                 if (playerGameObjects.ContainsKey(playerName))
@@ -120,6 +115,12 @@ public class PlayerMovement : MonoBehaviour
         var playersToRemove = playerGameObjects.Keys.Except(newPlayerPositions.Keys).ToList();
         foreach (string playerName in playersToRemove)
         {
+            if (playerMoveCoroutines.ContainsKey(playerName))
+            {
+                StopCoroutine(playerMoveCoroutines[playerName]);
+                playerMoveCoroutines.Remove(playerName);
+            }
+
             Destroy(playerGameObjects[playerName]);
             playerGameObjects.Remove(playerName);
             previousPlayerHealth.Remove(playerName);
@@ -135,21 +136,25 @@ public class PlayerMovement : MonoBehaviour
 
             if (playerGameObjects.ContainsKey(playerName))
             {
-                // If player already exists, update position
                 GameObject playerObject = playerGameObjects[playerName];
-                playerObject.transform.position = targetPosition;
 
-                // If player is alive set visibility
+                // If player is alive, set visibility
                 if (playerAliveState[playerName])
                 {
                     playerObject.SetActive(true);
                 }
+
+                // Start or restart the movement coroutine for this player
+                if (playerMoveCoroutines.ContainsKey(playerName))
+                {
+                    StopCoroutine(playerMoveCoroutines[playerName]);
+                }
+                playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(playerObject, targetPosition));
             }
             else
             {
                 // If player doesn't exist -> make new player object
                 GameObject prefab = (team == "CT") ? counterTerroristPrefab : terroristPrefab;
-                //Transform parent = (team == "CT") ? counterTerroristsParent : terroristsParent;
 
                 GameObject newPlayerObject = Instantiate(prefab, parent, false);
                 newPlayerObject.transform.position = targetPosition;
@@ -158,28 +163,32 @@ public class PlayerMovement : MonoBehaviour
 
                 previousPlayerHealth[playerName] = 100;
                 playerAliveState[playerName] = true;
+
+                // Start the movement coroutine for this new player
+                playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(newPlayerObject, targetPosition));
             }
         }
     }
 
-    void MovePlayers()
+    private System.Collections.IEnumerator SmoothMove(GameObject playerObject, Vector3 targetPosition)
     {
-        foreach (var kvp in playerGameObjects)
-        {
-            GameObject playerObject = kvp.Value;
-            string playerName = kvp.Key;
+        float time = 0f;
+        Vector3 startPosition = playerObject.transform.position;
 
-            if (playerGameObjects.TryGetValue(playerName, out GameObject obj))
-            {
-                Vector3 targetPos = obj.transform.position;
-                playerObject.transform.position = Vector3.MoveTowards(playerObject.transform.position, targetPos, speed * Time.deltaTime);
-            }
+        while (time < lerpDuration)
+        {
+            // Lerp from the start position to the target position over time
+            playerObject.transform.position = Vector3.Lerp(startPosition, targetPosition, time / lerpDuration);
+            time += Time.deltaTime;
+            yield return null;
         }
+
+        // Ensure the final position is set
+        playerObject.transform.position = targetPosition;
     }
 
     private System.Collections.IEnumerator FlashColor(GameObject playerObject)
     {
-        // Player object flashes red when damage taken
         Renderer renderer = playerObject.GetComponent<Renderer>();
 
         if (renderer == null)
