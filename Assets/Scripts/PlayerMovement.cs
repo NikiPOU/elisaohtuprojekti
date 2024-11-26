@@ -6,10 +6,10 @@ using System;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float speed = 0.2f;
     public GameObject counterTerroristPrefab;
     public GameObject terroristPrefab;
     public Transform parent;
+    public float lerpDuration = 5;
     public Color damageFlashColor = Color.red;
     public float flashDuration = 0.2f;
     [NonSerialized] public Transform counterTerroristsParent;
@@ -30,6 +30,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         gsiDataReceiver.OnPositionsDataReceived += UpdatePlayers;
+        StartCoroutine(MovePlayers());
     }
 
     private void OnDestroy()
@@ -38,11 +39,6 @@ public class PlayerMovement : MonoBehaviour
         {
             gsiDataReceiver.OnPositionsDataReceived -= UpdatePlayers;
         }
-    }
-
-    void Update()
-    {
-        MovePlayers();
     }
 
     void UpdatePlayers(string jsonData)
@@ -162,8 +158,9 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void MovePlayers()
+    System.Collections.IEnumerator MovePlayers()
     {
+        float time = 0;
         foreach (var kvp in playerGameObjects)
         {
             GameObject playerObject = kvp.Value;
@@ -171,8 +168,17 @@ public class PlayerMovement : MonoBehaviour
 
             if (playerGameObjects.TryGetValue(playerName, out GameObject obj))
             {
+                Vector3 startPosition = playerObject.transform.position;
                 Vector3 targetPos = obj.transform.position;
-                playerObject.transform.position = Vector3.MoveTowards(playerObject.transform.position, targetPos, speed * Time.deltaTime);
+                while (time < lerpDuration)
+                {
+                    playerObject.transform.position = Vector3.Lerp(startPosition, targetPos, time / lerpDuration);
+                    time += Time.deltaTime;
+                    yield return null;
+                }
+                playerObject.transform.position = targetPos;
+                //playerObject.transform.position = Vector3.MoveTowards(playerObject.transform.position, targetPos, speed * Time.deltaTime);
+
             }
         }
     }
