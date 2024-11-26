@@ -7110,12 +7110,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf311b67e0db68b07b67f1dfed153b19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.2
   counterTerroristPrefab: {fileID: 8216439050104495676, guid: 4e69b1b5c867a22429cb6301ada9ab7d,
     type: 3}
   terroristPrefab: {fileID: 6041701724466537169, guid: 5f0e85136acd48df1a083e13446788ac,
     type: 3}
   parent: {fileID: 1950540507}
+  lerpDuration: 0.3
   damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.2
 --- !u!1001 &1622050819
