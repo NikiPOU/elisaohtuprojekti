@@ -19,6 +19,7 @@ class DataProcessor:
                 kills = player["match_stats"]["kills"]
                 assists = player["match_stats"]["assists"]
                 deaths = player["match_stats"]["deaths"]
+                forward = player["forward"]
                 
 
                 self.game_data["player_data"][steam_id] = {
@@ -28,7 +29,8 @@ class DataProcessor:
                     "health": health,
                     "kills": kills,
                     "assists": assists,
-                    "deaths": deaths
+                    "deaths": deaths,
+                    "forward": forward
                 }
             self.game_data["match_data"]["map"] = data["map"]["name"]
             self.game_data["match_data"]["round"] = data["map"]["round"]
