@@ -4,16 +4,12 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using System;
 
-public class PlayerMovement : MonoBehaviour
+public class Player3DMovement : MonoBehaviour
 {
     public GameObject counterTerroristPrefab;
     public GameObject terroristPrefab;
     public Transform parent;
     public float lerpDuration = 0.3f;
-    public Color damageFlashColor = Color.red;
-    public float flashDuration = 0.2f;
-    [NonSerialized] public Transform counterTerroristsParent;
-    [NonSerialized] public Transform terroristsParent;
     private GSIDataReceiver gsiDataReceiver;
     private Dictionary<string, GameObject> playerGameObjects = new Dictionary<string, GameObject>();
     private Dictionary<string, int> previousPlayerHealth = new Dictionary<string, int>();
@@ -70,27 +66,11 @@ public class PlayerMovement : MonoBehaviour
             float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
             float z_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
             float y_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
-            Vector3 position = new Vector3(0.00059f * x_coord + 0.1f, 0.00059f * z_coord - 0.6f, -0.05f) + parent.position;
+            Vector3 position = new Vector3(0.00059f * x_coord, 0.00059f * y_coord, 0.00059f *z_coord);
 
             // Store player data
             newPlayerPositions[playerName] = position;
             newPlayerTeams[playerName] = team;
-
-            // Check for health
-            if (previousPlayerHealth.ContainsKey(playerName))
-            {
-                int previousHealth = previousPlayerHealth[playerName];
-                if (currentHealth < previousHealth)
-                {
-                    // Player damaged
-                    if (playerGameObjects.ContainsKey(playerName))
-                    {
-                        GameObject playerObject = playerGameObjects[playerName];
-                        Debug.Log("Player hit: " + playerName);
-                        StartCoroutine(FlashColor(playerObject));
-                    }
-                }
-            }
 
             previousPlayerHealth[playerName] = currentHealth;
 
@@ -185,18 +165,5 @@ public class PlayerMovement : MonoBehaviour
 
         // Ensure the final position is set
         playerObject.transform.position = targetPosition;
-    }
-
-    private System.Collections.IEnumerator FlashColor(GameObject playerObject)
-    {
-        Renderer renderer = playerObject.GetComponent<Renderer>();
-
-        if (renderer == null)
-            yield break;
-
-        Color originalColor = renderer.material.color;
-        renderer.material.color = damageFlashColor;
-        yield return new WaitForSeconds(flashDuration);
-        renderer.material.color = originalColor;
     }
 }
