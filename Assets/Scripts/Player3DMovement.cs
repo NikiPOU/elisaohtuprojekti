@@ -66,7 +66,7 @@ public class Player3DMovement : MonoBehaviour
             float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
             float z_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
             float y_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
-            Vector3 position = new Vector3(0.00059f * x_coord, 0.00059f * y_coord, 0.00059f *z_coord) + parent.position;
+            Vector3 position = new Vector3(0.00059f * x_coord, 0.00059f * y_coord + 0.5f, 0.00059f * z_coord - 0.5f);
 
             // Store player data
             newPlayerPositions[playerName] = position;
@@ -166,4 +166,5 @@ public class Player3DMovement : MonoBehaviour
         // Ensure the final position is set
         playerObject.transform.position = targetPosition;
     }
+
 }
