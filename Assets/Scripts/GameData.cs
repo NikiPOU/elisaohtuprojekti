@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using UnityEngine;
 using TMPro;
 using Newtonsoft.Json.Linq;
@@ -8,6 +9,8 @@ public class Statistics : MonoBehaviour
 {
     public TMP_Text text; // TextMeshPro component
     public GSIDataReceiver gsiDataReceiver; // GSIDataReceiver script component
+    private DataTable cTerroristTable;
+    private DataTable terroristTable;
 
     // Initialize method for testing
     public void Initialize()
@@ -37,6 +40,9 @@ public class Statistics : MonoBehaviour
             return; //Exit if GSI data receiver is nout found
         }
 
+        DataTable cTerroristTable = CreateTable("Counterterrorists");
+        DataTable terroristTable = CreateTable("Terrorists");
+
         gsiDataReceiver.OnStatisticsDataReceived += StatisticsUpdate;
     }
 
@@ -48,7 +54,7 @@ public class Statistics : MonoBehaviour
         }
     }
 
-    void StatisticsUpdate(string jsaonData)
+    void StatisticsUpdate(string jsonData)
     {
         if (gsiDataReceiver != null && text != null)
         {
@@ -66,7 +72,8 @@ public class Statistics : MonoBehaviour
             return "No players found.";
         }
 
-        List<string> playerDetails = new List<string>();
+        List<string> terroristDetails = new List<string>();
+        List<string> CTerroristDetails = new List<string>();
 
         // Iterate over the properties of allPlayers
         foreach (var property in ((JObject)allPlayers).Properties())
@@ -77,19 +84,76 @@ public class Statistics : MonoBehaviour
             // Extract details from the array
             string playerName = playerData[0]?.ToString() ?? "Unknown";
             string team = playerData[1]?.ToString() ?? "No Team";
-            int health = playerData[2]?.ToObject<int>() ?? 0;
-            int kills = playerData[3]?.ToObject<int>() ?? 0;
-            int assists = playerData[4]?.ToObject<int>() ?? 0;
-            int deaths = playerData[5]?.ToObject<int>() ?? 0;
+            string health = playerData[2]?.ToString() ?? "0";
+            string kills = playerData[3]?.ToString() ?? "0";
+            string assists = playerData[4]?.ToString() ?? "0";
+            string deaths = playerData[5]?.ToString() ?? "0";
 
             // Format the data
-            string handledData = $"Player: {playerName} | " +
-                                $"Team: {team} | Health: {health} | " +
-                                $"Kills: {kills} | Assists: {assists} | Deaths: {deaths}";
+            //string handledData = $"{playerName} | " +
+                                //$"Team: {team} | Health: {health} | " +
+                                //$"Kills: {kills} | Assists: {assists} | Deaths: {deaths} \n";
 
-            playerDetails.Add(handledData);
+           AddStatistics(name, team, health, kills, deaths, assists);
         }
-        return string.Join("\n", playerDetails);
+
+        //string cTerrorists = string.Join("\n", CTerroristDetails);
+        //string terrorists = string.Join("\n", terroristDetails);
+        //return cTerrorists + "\n \n" + terrorists;
+        string cTerroristsString = ConvertTableToString(cTerroristTable);
+        string terroristString = ConvertTableToString(terroristTable);
+        return cTerroristsString + "\n" + terroristString;
     }
+
+    DataTable CreateTable(string tableName)
+    {
+        DataTable dataTable = new DataTable(tableName);
+
+        dataTable.Columns.Add("Name", typeof(string));
+        dataTable.Columns.Add("Team", typeof(string));
+        dataTable.Columns.Add("Health", typeof(string));
+        dataTable.Columns.Add("Kills", typeof(string));
+        dataTable.Columns.Add("Assists", typeof(string));
+        dataTable.Columns.Add("Deaths", typeof(string));
+
+        return dataTable;
+    }
+
+    void AddStatistics(string name, string team, string health, string kills, string assists, string deaths)
+    {
+        if (team == "CT")
+        {
+            cTerroristTable.Rows.Add(name, team, health, kills, assists, deaths);
+        }
+        else
+        {
+            terroristTable.Rows.Add(name, team, health, kills, assists, deaths);
+        }
+        
+    }
+
+    string ConvertTableToString(DataTable dataTable)
+        {
+            string tableString = "";
+
+            // Add column headers
+            foreach (DataColumn column in dataTable.Columns)
+            {
+                tableString += column.ColumnName + "\t";
+            }
+            tableString += "\n";
+
+            // Add rows
+            foreach (DataRow row in dataTable.Rows)
+            {
+                foreach (var item in row.ItemArray)
+                {
+                    tableString += item.ToString() + "\t";
+                }
+                tableString += "\n";
+            }
+
+            return tableString;
+        }
 
 }
