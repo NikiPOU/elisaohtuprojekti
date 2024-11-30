@@ -97,7 +97,7 @@ public class Statistics : MonoBehaviour
 
         string cTerroristsString = ConvertTableToString(cTerroristTable, true); // Include headers for CT
         string terroristString = ConvertTableToString(terroristTable, false); // Exclude headers for Terrorists
-        return "\n" + cTerroristsString + "Counter-Terrorists\n" + "\nTerrorists\n" + terroristString;
+        return "\n" + cTerroristsString + "\nCounter-Terrorists\n" + "\nTerrorists\n\n" + terroristString;
     }
 
 
@@ -130,17 +130,18 @@ public class Statistics : MonoBehaviour
 
     string ConvertTableToString(DataTable dataTable, bool includeHeaders)
     {
-        const int columnWidth = 15; // Define a fixed width for all columns
+        const int columnWidth = 10; // Define a fixed width for all columns
         string tableString = "";
 
         if (includeHeaders)
         {
+            tableString += " ";
             // Add column headers
             foreach (DataColumn column in dataTable.Columns)
             {
                 tableString += column.ColumnName.PadRight(columnWidth); // Pad column headers
             }
-            tableString += "\n";
+            tableString += "\n\n";
         }
 
         // Add rows

@@ -4934,7 +4934,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e739b972f6bbb074384a1bb770b09846, type: 2}
+  - {fileID: 2100000, guid: 682d500b4a8bee0c187e9221aaca91b5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5519,21 +5519,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\nName           Kills          Deaths         Assists        Health        
-    \nFerris                2              3              0             100     
-    \nAdonis                1              1              0             81      
-    \nMiguel                4              2              1             38      
-    \nColin                 2              2              1             100     
-    \nYanni                 4              3              0             100     
-    \nCounter Terrorists\n\nTerrorists\nEfe                   1              3             
-    1             72       \nYuri                  1              1             
-    0             100      \nConleth               2              4             
-    0             55       \nGreymouth             1              3             
-    0             100      \nPines                 6              2             
-    1             48   \n"
+  m_text: New text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: c1330b42563a7d04d884db3fad6668fa, type: 2}
-  m_sharedMaterial: {fileID: 7492378855773022835, guid: c1330b42563a7d04d884db3fad6668fa,
+  m_fontAsset: {fileID: 11400000, guid: d652ebf3c6730fd858ce41f41b1f67ed, type: 2}
+  m_sharedMaterial: {fileID: -6481358722420658380, guid: d652ebf3c6730fd858ce41f41b1f67ed,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
