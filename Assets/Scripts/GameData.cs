@@ -97,7 +97,7 @@ public class Statistics : MonoBehaviour
 
         string cTerroristsString = ConvertTableToString(cTerroristTable, true); // Include headers for CT
         string terroristString = ConvertTableToString(terroristTable, false); // Exclude headers for Terrorists
-        return "Counter Terrorists\n" + cTerroristsString + "\nTerrorists\n" + terroristString;
+        return "\n" + cTerroristsString + "Counter-Terrorists\n" + "\nTerrorists\n" + terroristString;
     }
 
 
@@ -141,9 +141,6 @@ public class Statistics : MonoBehaviour
                 tableString += column.ColumnName.PadRight(columnWidth); // Pad column headers
             }
             tableString += "\n";
-
-            // Add a separator line for clarity
-            tableString += new string('-', columnWidth * dataTable.Columns.Count) + "\n";
         }
 
         // Add rows
