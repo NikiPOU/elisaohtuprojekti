@@ -40,8 +40,8 @@ public class Statistics : MonoBehaviour
             return; //Exit if GSI data receiver is nout found
         }
 
-        DataTable cTerroristTable = CreateTable("Counterterrorists");
-        DataTable terroristTable = CreateTable("Terrorists");
+        cTerroristTable = CreateTable("Counterterrorists");
+        terroristTable = CreateTable("Terrorists");
 
         gsiDataReceiver.OnStatisticsDataReceived += StatisticsUpdate;
     }
@@ -58,6 +58,9 @@ public class Statistics : MonoBehaviour
     {
         if (gsiDataReceiver != null && text != null)
         {
+            text.text = "";
+            cTerroristTable.Clear();
+            terroristTable.Clear();
             // Extract important data from GSI and update the display text
             string important = ParseGSI(gsiDataReceiver.statisticsData);
             text.text = important; // Update the UI with server data
@@ -89,71 +92,81 @@ public class Statistics : MonoBehaviour
             string assists = playerData[4]?.ToString() ?? "0";
             string deaths = playerData[5]?.ToString() ?? "0";
 
-            // Format the data
-            //string handledData = $"{playerName} | " +
-                                //$"Team: {team} | Health: {health} | " +
-                                //$"Kills: {kills} | Assists: {assists} | Deaths: {deaths} \n";
-
-           AddStatistics(name, team, health, kills, deaths, assists);
+            AddStatistics(playerName, team, kills, deaths, assists, health);
         }
 
-        //string cTerrorists = string.Join("\n", CTerroristDetails);
-        //string terrorists = string.Join("\n", terroristDetails);
-        //return cTerrorists + "\n \n" + terrorists;
-        string cTerroristsString = ConvertTableToString(cTerroristTable);
-        string terroristString = ConvertTableToString(terroristTable);
-        return cTerroristsString + "\n" + terroristString;
+        string cTerroristsString = ConvertTableToString(cTerroristTable, true); // Include headers for CT
+        string terroristString = ConvertTableToString(terroristTable, false); // Exclude headers for Terrorists
+        return "Counter Terrorists\n" + cTerroristsString + "\nTerrorists\n" + terroristString;
     }
+
 
     DataTable CreateTable(string tableName)
     {
         DataTable dataTable = new DataTable(tableName);
 
         dataTable.Columns.Add("Name", typeof(string));
-        dataTable.Columns.Add("Team", typeof(string));
-        dataTable.Columns.Add("Health", typeof(string));
-        dataTable.Columns.Add("Kills", typeof(string));
-        dataTable.Columns.Add("Assists", typeof(string));
-        dataTable.Columns.Add("Deaths", typeof(string));
+        dataTable.Columns.Add("Kills", typeof(int));
+        dataTable.Columns.Add("Deaths", typeof(int));
+        dataTable.Columns.Add("Assists", typeof(int));
+        dataTable.Columns.Add("Health", typeof(int));
 
         return dataTable;
     }
 
-    void AddStatistics(string name, string team, string health, string kills, string assists, string deaths)
+
+    void AddStatistics(string name, string team, string kills, string deaths, string assists, string health)
     {
         if (team == "CT")
         {
-            cTerroristTable.Rows.Add(name, team, health, kills, assists, deaths);
+            cTerroristTable.Rows.Add(name, kills, deaths, assists, health);
         }
         else
         {
-            terroristTable.Rows.Add(name, team, health, kills, assists, deaths);
+            terroristTable.Rows.Add(name, kills, deaths, assists, health);
         }
         
     }
 
-    string ConvertTableToString(DataTable dataTable)
-        {
-            string tableString = "";
+    string ConvertTableToString(DataTable dataTable, bool includeHeaders)
+    {
+        const int columnWidth = 15; // Define a fixed width for all columns
+        string tableString = "";
 
+        if (includeHeaders)
+        {
             // Add column headers
             foreach (DataColumn column in dataTable.Columns)
             {
-                tableString += column.ColumnName + "\t";
+                tableString += column.ColumnName.PadRight(columnWidth); // Pad column headers
             }
             tableString += "\n";
 
-            // Add rows
-            foreach (DataRow row in dataTable.Rows)
-            {
-                foreach (var item in row.ItemArray)
-                {
-                    tableString += item.ToString() + "\t";
-                }
-                tableString += "\n";
-            }
-
-            return tableString;
+            // Add a separator line for clarity
+            tableString += new string('-', columnWidth * dataTable.Columns.Count) + "\n";
         }
+
+        // Add rows
+        foreach (DataRow row in dataTable.Rows)
+        {
+            foreach (var item in row.ItemArray)
+            {
+                string value = item.ToString();
+
+                // Calculate padding to align the first character
+                int leadingSpaces = columnWidth - value.Length; // Total space left after placing the value
+                int firstCharPadding = (value.Length > 0 && char.IsDigit(value[0])) ? leadingSpaces / 2 : 0;
+
+                // Add padding before and after the value
+                string paddedValue = new string(' ', firstCharPadding) + value + new string(' ', leadingSpaces - firstCharPadding);
+
+                tableString += paddedValue;
+            }
+            tableString += "\n";
+        }
+
+        return tableString;
+    }
+
 
 }
