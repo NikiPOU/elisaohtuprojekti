@@ -9,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
     public GameObject counterTerroristPrefab;
     public GameObject terroristPrefab;
     public Transform parent;
-    public float lerpDuration = 5;
+    public float lerpDuration = 1;
     public Color damageFlashColor = Color.red;
     public float flashDuration = 0.2f;
     [NonSerialized] public Transform counterTerroristsParent;
@@ -19,6 +19,7 @@ public class PlayerMovement : MonoBehaviour
     private Dictionary<string, int> previousPlayerHealth = new Dictionary<string, int>();
     private Dictionary<string, bool> playerAliveState = new Dictionary<string, bool>();
     private Dictionary<string, Coroutine> playerMoveCoroutines = new Dictionary<string, Coroutine>();
+    private Dictionary<string, Vector3> newPlayerForward = new Dictionary<string, Vector3>();
 
     void Start()
     {
@@ -53,6 +54,7 @@ public class PlayerMovement : MonoBehaviour
         // Store the new player data
         Dictionary<string, Vector3> newPlayerPositions = new Dictionary<string, Vector3>();
         Dictionary<string, string> newPlayerTeams = new Dictionary<string, string>();
+        Dictionary<string, Quaternion> newPlayerRotations = new Dictionary<string, Quaternion>();
 
         foreach (var property in ((JObject)allPlayers).Properties())
         {
@@ -62,19 +64,34 @@ public class PlayerMovement : MonoBehaviour
             string playerName = playerData[1]?.ToString();
             string team = playerData[2]?.ToString();
             int currentHealth = playerData[3]?.ToObject<int>() ?? 100;
+            string forwardString = playerData[4]?.ToString();
 
-            if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(team) || string.IsNullOrEmpty(positionString))
+            if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(team) || string.IsNullOrEmpty(positionString) || string.IsNullOrEmpty(forwardString))
                 continue;
 
+            // Parse position
             string[] coords = positionString.Split(", ");
             float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
             float z_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
             float y_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
             Vector3 position = new Vector3(0.00059f * x_coord + 0.1f, 0.00059f * z_coord - 0.6f, -0.05f) + parent.position;
 
+            // Parse forward vector
+            string[] forwardCoords = forwardString.Split(", ");
+            float fx = float.Parse(forwardCoords[0], System.Globalization.CultureInfo.InvariantCulture);
+            float fz = float.Parse(forwardCoords[1], System.Globalization.CultureInfo.InvariantCulture);
+            float fy = float.Parse(forwardCoords[2], System.Globalization.CultureInfo.InvariantCulture);
+            Vector3 forward = new Vector3(fx, fz, fy);
+
             // Store player data
             newPlayerPositions[playerName] = position;
             newPlayerTeams[playerName] = team;
+            newPlayerForward[playerName] = forward;
+
+            // Calculate target rotation
+            Quaternion targetRotation = Quaternion.LookRotation(forward, Vector3.up);
+            targetRotation = Quaternion.Euler(targetRotation.eulerAngles.x, targetRotation.eulerAngles.x, 0f);
+            newPlayerRotations[playerName] = targetRotation;
 
             // Check for health
             if (previousPlayerHealth.ContainsKey(playerName))
@@ -133,6 +150,7 @@ public class PlayerMovement : MonoBehaviour
             string playerName = kvp.Key;
             Vector3 targetPosition = kvp.Value;
             string team = newPlayerTeams[playerName];
+            Quaternion targetRotation = newPlayerRotations[playerName];
 
             if (playerGameObjects.ContainsKey(playerName))
             {
@@ -149,7 +167,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     StopCoroutine(playerMoveCoroutines[playerName]);
                 }
-                playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(playerObject, targetPosition));
+                playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(playerObject, targetPosition, targetRotation));
             }
             else
             {
@@ -165,26 +183,29 @@ public class PlayerMovement : MonoBehaviour
                 playerAliveState[playerName] = true;
 
                 // Start the movement coroutine for this new player
-                playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(newPlayerObject, targetPosition));
+                playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(newPlayerObject, targetPosition, targetRotation));
             }
         }
     }
 
-    private System.Collections.IEnumerator SmoothMove(GameObject playerObject, Vector3 targetPosition)
+    private System.Collections.IEnumerator SmoothMove(GameObject playerObject, Vector3 targetPosition, Quaternion targetRotation)
     {
         float time = 0f;
         Vector3 startPosition = playerObject.transform.position;
+        Quaternion startRotation = playerObject.transform.rotation;
 
         while (time < lerpDuration)
         {
             // Lerp from the start position to the target position over time
             playerObject.transform.position = Vector3.Lerp(startPosition, targetPosition, time / lerpDuration);
+            playerObject.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, time / lerpDuration);
             time += Time.deltaTime;
             yield return null;
         }
 
-        // Ensure the final position is set
+        // Ensure the final position and rotation are set
         playerObject.transform.position = targetPosition;
+        playerObject.transform.rotation = targetRotation;
     }
 
     private System.Collections.IEnumerator FlashColor(GameObject playerObject)
@@ -200,3 +221,4 @@ public class PlayerMovement : MonoBehaviour
         renderer.material.color = originalColor;
     }
 }
+
