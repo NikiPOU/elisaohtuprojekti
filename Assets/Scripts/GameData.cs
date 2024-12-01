@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using UnityEngine;
 using TMPro;
 using Newtonsoft.Json.Linq;
@@ -8,6 +9,8 @@ public class Statistics : MonoBehaviour
 {
     public TMP_Text text; // TextMeshPro component
     public GSIDataReceiver gsiDataReceiver; // GSIDataReceiver script component
+    private DataTable cTerroristTable;
+    private DataTable terroristTable;
 
     // Initialize method for testing
     public void Initialize()
@@ -37,6 +40,9 @@ public class Statistics : MonoBehaviour
             return; //Exit if GSI data receiver is nout found
         }
 
+        cTerroristTable = CreateTable("Counterterrorists");
+        terroristTable = CreateTable("Terrorists");
+
         gsiDataReceiver.OnStatisticsDataReceived += StatisticsUpdate;
     }
 
@@ -48,10 +54,13 @@ public class Statistics : MonoBehaviour
         }
     }
 
-    void StatisticsUpdate(string jsaonData)
+    void StatisticsUpdate(string jsonData)
     {
         if (gsiDataReceiver != null && text != null)
         {
+            text.text = "";
+            cTerroristTable.Clear();
+            terroristTable.Clear();
             // Extract important data from GSI and update the display text
             string important = ParseGSI(gsiDataReceiver.statisticsData);
             text.text = important; // Update the UI with server data
@@ -66,7 +75,8 @@ public class Statistics : MonoBehaviour
             return "No players found.";
         }
 
-        List<string> playerDetails = new List<string>();
+        List<string> terroristDetails = new List<string>();
+        List<string> CTerroristDetails = new List<string>();
 
         // Iterate over the properties of allPlayers
         foreach (var property in ((JObject)allPlayers).Properties())
@@ -77,19 +87,84 @@ public class Statistics : MonoBehaviour
             // Extract details from the array
             string playerName = playerData[0]?.ToString() ?? "Unknown";
             string team = playerData[1]?.ToString() ?? "No Team";
-            int health = playerData[2]?.ToObject<int>() ?? 0;
-            int kills = playerData[3]?.ToObject<int>() ?? 0;
-            int assists = playerData[4]?.ToObject<int>() ?? 0;
-            int deaths = playerData[5]?.ToObject<int>() ?? 0;
+            string health = playerData[2]?.ToString() ?? "0";
+            string kills = playerData[3]?.ToString() ?? "0";
+            string assists = playerData[4]?.ToString() ?? "0";
+            string deaths = playerData[5]?.ToString() ?? "0";
 
-            // Format the data
-            string handledData = $"Player: {playerName} | " +
-                                $"Team: {team} | Health: {health} | " +
-                                $"Kills: {kills} | Assists: {assists} | Deaths: {deaths}";
-
-            playerDetails.Add(handledData);
+            AddStatistics(playerName, team, kills, deaths, assists, health);
         }
-        return string.Join("\n", playerDetails);
+
+        string cTerroristsString = ConvertTableToString(cTerroristTable, true); // Include headers for CT
+        string terroristString = ConvertTableToString(terroristTable, false); // Exclude headers for Terrorists
+        return "\n" + cTerroristsString + "\nCounter-Terrorists\n" + "\nTerrorists\n\n" + terroristString;
     }
+
+
+    DataTable CreateTable(string tableName)
+    {
+        DataTable dataTable = new DataTable(tableName);
+
+        dataTable.Columns.Add("Name", typeof(string));
+        dataTable.Columns.Add("Kills", typeof(int));
+        dataTable.Columns.Add("Deaths", typeof(int));
+        dataTable.Columns.Add("Assists", typeof(int));
+        dataTable.Columns.Add("Health", typeof(int));
+
+        return dataTable;
+    }
+
+
+    void AddStatistics(string name, string team, string kills, string deaths, string assists, string health)
+    {
+        if (team == "CT")
+        {
+            cTerroristTable.Rows.Add(name, kills, deaths, assists, health);
+        }
+        else
+        {
+            terroristTable.Rows.Add(name, kills, deaths, assists, health);
+        }
+        
+    }
+
+    string ConvertTableToString(DataTable dataTable, bool includeHeaders)
+    {
+        const int columnWidth = 10; // Define a fixed width for all columns
+        string tableString = "";
+
+        if (includeHeaders)
+        {
+            tableString += " ";
+            // Add column headers
+            foreach (DataColumn column in dataTable.Columns)
+            {
+                tableString += column.ColumnName.PadRight(columnWidth); // Pad column headers
+            }
+            tableString += "\n\n";
+        }
+
+        // Add rows
+        foreach (DataRow row in dataTable.Rows)
+        {
+            foreach (var item in row.ItemArray)
+            {
+                string value = item.ToString();
+
+                // Calculate padding to align the first character
+                int leadingSpaces = columnWidth - value.Length; // Total space left after placing the value
+                int firstCharPadding = (value.Length > 0 && char.IsDigit(value[0])) ? leadingSpaces / 2 : 0;
+
+                // Add padding before and after the value
+                string paddedValue = new string(' ', firstCharPadding) + value + new string(' ', leadingSpaces - firstCharPadding);
+
+                tableString += paddedValue;
+            }
+            tableString += "\n";
+        }
+
+        return tableString;
+    }
+
 
 }
