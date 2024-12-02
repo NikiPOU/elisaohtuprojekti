@@ -9,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
     public GameObject counterTerroristPrefab;
     public GameObject terroristPrefab;
     public Transform parent;
-    public float lerpDuration = 1;
+    public float lerpDuration = 0.3f;
     public Color damageFlashColor = Color.red;
     public float flashDuration = 0.2f;
     [NonSerialized] public Transform counterTerroristsParent;
