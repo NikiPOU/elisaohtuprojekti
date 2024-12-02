@@ -22,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     private Dictionary<string, Vector3> newPlayerForward = new Dictionary<string, Vector3>();
     private Dictionary<string, Coroutine> playerFlashCoroutines = new Dictionary<string, Coroutine>();
     private Dictionary<string, Color> originalPlayerColors = new Dictionary<string, Color>();
+    
 
     void Start()
     {
@@ -32,7 +33,7 @@ public class PlayerMovement : MonoBehaviour
             Debug.LogError("GSIDataReceiver not found in the scene.");
             return;
         }
-
+        
         gsiDataReceiver.OnPositionsDataReceived += UpdatePlayers;
     }
 
@@ -57,6 +58,7 @@ public class PlayerMovement : MonoBehaviour
         Dictionary<string, Vector3> newPlayerPositions = new Dictionary<string, Vector3>();
         Dictionary<string, string> newPlayerTeams = new Dictionary<string, string>();
         Dictionary<string, Quaternion> newPlayerRotations = new Dictionary<string, Quaternion>();
+        Dictionary<string, Vector3> newPlayerScales = new Dictionary<string, Vector3>();
 
         foreach (var property in ((JObject)allPlayers).Properties())
         {
@@ -78,12 +80,25 @@ public class PlayerMovement : MonoBehaviour
             float y_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
             Vector3 position = new Vector3(0.00059f * x_coord + 0.1f, 0.00059f * z_coord - 0.6f, -0.05f) + parent.position;
 
+            // Apply map rotation and scale to the position
+            Vector3 initialScale = new Vector3(2.68f, 2.68f, 1f);
+            Vector3 scaleFactor = new Vector3(
+                parent.localScale.x / initialScale.x,
+                parent.localScale.y / initialScale.y,
+                parent.localScale.z / initialScale.z
+            );
+            position = parent.rotation * Vector3.Scale(position - parent.position, scaleFactor) + parent.position;
+
             // Parse forward vector
             string[] forwardCoords = forwardString.Split(", ");
             float fx = float.Parse(forwardCoords[0], System.Globalization.CultureInfo.InvariantCulture);
             float fz = float.Parse(forwardCoords[1], System.Globalization.CultureInfo.InvariantCulture);
             float fy = float.Parse(forwardCoords[2], System.Globalization.CultureInfo.InvariantCulture);
             Vector3 forward = new Vector3(fx, fz, fy);
+
+            // Apply map rotation to the forward vector
+            forward = parent.rotation * forward;
+
 
             // Store player data
             newPlayerPositions[playerName] = position;
@@ -209,6 +224,19 @@ public class PlayerMovement : MonoBehaviour
                 playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(newPlayerObject, targetPosition, targetRotation));
             }
         }
+
+        // Apply the new scales to the player objects
+        foreach (var kvp in newPlayerScales)
+        {
+            string playerName = kvp.Key;
+            Vector3 targetScale = kvp.Value;
+
+            if (playerGameObjects.ContainsKey(playerName))
+            {
+                GameObject playerObject = playerGameObjects[playerName];
+                playerObject.transform.localScale = targetScale;
+            }
+        }
     }
 
     private System.Collections.IEnumerator SmoothMove(GameObject playerObject, Vector3 targetPosition, Quaternion targetRotation)
@@ -244,4 +272,3 @@ public class PlayerMovement : MonoBehaviour
         renderer.material.color = originalColor;
     }
 }
-
