@@ -20,6 +20,8 @@ public class PlayerMovement : MonoBehaviour
     private Dictionary<string, bool> playerAliveState = new Dictionary<string, bool>();
     private Dictionary<string, Coroutine> playerMoveCoroutines = new Dictionary<string, Coroutine>();
     private Dictionary<string, Vector3> newPlayerForward = new Dictionary<string, Vector3>();
+    private Dictionary<string, Coroutine> playerFlashCoroutines = new Dictionary<string, Coroutine>();
+    private Dictionary<string, Color> originalPlayerColors = new Dictionary<string, Color>();
 
     void Start()
     {
@@ -90,7 +92,7 @@ public class PlayerMovement : MonoBehaviour
 
             // Calculate target rotation
             Quaternion targetRotation = Quaternion.LookRotation(forward, Vector3.up);
-            targetRotation = Quaternion.Euler(targetRotation.eulerAngles.x, targetRotation.eulerAngles.x, 0f);
+            targetRotation = Quaternion.Euler(targetRotation.eulerAngles.x, targetRotation.eulerAngles.y, 0f);
             newPlayerRotations[playerName] = targetRotation;
 
             // Check for health
@@ -104,7 +106,12 @@ public class PlayerMovement : MonoBehaviour
                     {
                         GameObject playerObject = playerGameObjects[playerName];
                         Debug.Log("Player hit: " + playerName);
-                        StartCoroutine(FlashColor(playerObject));
+                        
+                        if (playerFlashCoroutines.ContainsKey(playerName))
+                        {
+                            StopCoroutine(playerFlashCoroutines[playerName]);
+                        }
+                        playerFlashCoroutines[playerName] = StartCoroutine(FlashColor(playerObject));
                     }
                 }
             }
@@ -142,6 +149,7 @@ public class PlayerMovement : MonoBehaviour
             playerGameObjects.Remove(playerName);
             previousPlayerHealth.Remove(playerName);
             playerAliveState.Remove(playerName);
+            originalPlayerColors.Remove(playerName);
         }
 
         // Create new players and update existing ones
@@ -168,6 +176,15 @@ public class PlayerMovement : MonoBehaviour
                     StopCoroutine(playerMoveCoroutines[playerName]);
                 }
                 playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(playerObject, targetPosition, targetRotation));
+
+                if (!playerFlashCoroutines.ContainsKey(playerName) && originalPlayerColors.ContainsKey(playerName))
+                {
+                    Renderer renderer = playerObject.GetComponent<Renderer>();
+                    if (renderer != null)
+                    {
+                        renderer.material.color = originalPlayerColors[playerName];
+                    }
+                }
             }
             else
             {
@@ -181,6 +198,12 @@ public class PlayerMovement : MonoBehaviour
 
                 previousPlayerHealth[playerName] = 100;
                 playerAliveState[playerName] = true;
+
+                Renderer renderer = newPlayerObject.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    originalPlayerColors[playerName] = renderer.material.color;
+                }
 
                 // Start the movement coroutine for this new player
                 playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(newPlayerObject, targetPosition, targetRotation));
@@ -215,7 +238,7 @@ public class PlayerMovement : MonoBehaviour
         if (renderer == null)
             yield break;
 
-        Color originalColor = renderer.material.color;
+        Color originalColor = originalPlayerColors[playerObject.name];
         renderer.material.color = damageFlashColor;
         yield return new WaitForSeconds(flashDuration);
         renderer.material.color = originalColor;
