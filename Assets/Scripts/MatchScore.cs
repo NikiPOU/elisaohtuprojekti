@@ -40,7 +40,7 @@ public class MatchScore : MonoBehaviour
             int scoreCT = matchData["score_ct"]?.Value<int>() ?? 0; 
             int scoreT = matchData["score_t"]?.Value<int>() ?? 0;
             // Update the TextMeshPro text
-            textMeshPro.text = $"{scoreCT} - {scoreT}";
+            textMeshPro.text = $"<color=#51CDF3>{scoreCT}</color>  -  <color=#EFDE49>{scoreT}</color>";
         }
     }
 
