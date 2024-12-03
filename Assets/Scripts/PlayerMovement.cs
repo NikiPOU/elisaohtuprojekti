@@ -9,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
     public GameObject counterTerroristPrefab;
     public GameObject terroristPrefab;
     public Transform parent;
-    public float lerpDuration = 1;
+    public float lerpDuration = 0.3f;
     public Color damageFlashColor = Color.red;
     public float flashDuration = 0.2f;
     [NonSerialized] public Transform counterTerroristsParent;
@@ -20,6 +20,9 @@ public class PlayerMovement : MonoBehaviour
     private Dictionary<string, bool> playerAliveState = new Dictionary<string, bool>();
     private Dictionary<string, Coroutine> playerMoveCoroutines = new Dictionary<string, Coroutine>();
     private Dictionary<string, Vector3> newPlayerForward = new Dictionary<string, Vector3>();
+    private Dictionary<string, Coroutine> playerFlashCoroutines = new Dictionary<string, Coroutine>();
+    private Dictionary<string, Color> originalPlayerColors = new Dictionary<string, Color>();
+    
 
     void Start()
     {
@@ -30,7 +33,7 @@ public class PlayerMovement : MonoBehaviour
             Debug.LogError("GSIDataReceiver not found in the scene.");
             return;
         }
-
+        
         gsiDataReceiver.OnPositionsDataReceived += UpdatePlayers;
     }
 
@@ -55,6 +58,7 @@ public class PlayerMovement : MonoBehaviour
         Dictionary<string, Vector3> newPlayerPositions = new Dictionary<string, Vector3>();
         Dictionary<string, string> newPlayerTeams = new Dictionary<string, string>();
         Dictionary<string, Quaternion> newPlayerRotations = new Dictionary<string, Quaternion>();
+        Dictionary<string, Vector3> newPlayerScales = new Dictionary<string, Vector3>();
 
         foreach (var property in ((JObject)allPlayers).Properties())
         {
@@ -76,12 +80,25 @@ public class PlayerMovement : MonoBehaviour
             float y_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
             Vector3 position = new Vector3(0.00059f * x_coord + 0.1f, 0.00059f * z_coord - 0.6f, -0.05f) + parent.position;
 
+            // Apply map rotation and scale to the position
+            Vector3 initialScale = new Vector3(2.68f, 2.68f, 1f);
+            Vector3 scaleFactor = new Vector3(
+                parent.localScale.x / initialScale.x,
+                parent.localScale.y / initialScale.y,
+                parent.localScale.z / initialScale.z
+            );
+            position = parent.rotation * Vector3.Scale(position - parent.position, scaleFactor) + parent.position;
+
             // Parse forward vector
             string[] forwardCoords = forwardString.Split(", ");
             float fx = float.Parse(forwardCoords[0], System.Globalization.CultureInfo.InvariantCulture);
             float fz = float.Parse(forwardCoords[1], System.Globalization.CultureInfo.InvariantCulture);
             float fy = float.Parse(forwardCoords[2], System.Globalization.CultureInfo.InvariantCulture);
             Vector3 forward = new Vector3(fx, fz, fy);
+
+            // Apply map rotation to the forward vector
+            forward = parent.rotation * forward;
+
 
             // Store player data
             newPlayerPositions[playerName] = position;
@@ -90,7 +107,7 @@ public class PlayerMovement : MonoBehaviour
 
             // Calculate target rotation
             Quaternion targetRotation = Quaternion.LookRotation(forward, Vector3.up);
-            targetRotation = Quaternion.Euler(targetRotation.eulerAngles.x, targetRotation.eulerAngles.x, 0f);
+            targetRotation = Quaternion.Euler(targetRotation.eulerAngles.x, targetRotation.eulerAngles.y, 0f);
             newPlayerRotations[playerName] = targetRotation;
 
             // Check for health
@@ -104,7 +121,12 @@ public class PlayerMovement : MonoBehaviour
                     {
                         GameObject playerObject = playerGameObjects[playerName];
                         Debug.Log("Player hit: " + playerName);
-                        StartCoroutine(FlashColor(playerObject));
+                        
+                        if (playerFlashCoroutines.ContainsKey(playerName))
+                        {
+                            StopCoroutine(playerFlashCoroutines[playerName]);
+                        }
+                        playerFlashCoroutines[playerName] = StartCoroutine(FlashColor(playerObject));
                     }
                 }
             }
@@ -142,6 +164,7 @@ public class PlayerMovement : MonoBehaviour
             playerGameObjects.Remove(playerName);
             previousPlayerHealth.Remove(playerName);
             playerAliveState.Remove(playerName);
+            originalPlayerColors.Remove(playerName);
         }
 
         // Create new players and update existing ones
@@ -168,6 +191,15 @@ public class PlayerMovement : MonoBehaviour
                     StopCoroutine(playerMoveCoroutines[playerName]);
                 }
                 playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(playerObject, targetPosition, targetRotation));
+
+                if (!playerFlashCoroutines.ContainsKey(playerName) && originalPlayerColors.ContainsKey(playerName))
+                {
+                    Renderer renderer = playerObject.GetComponent<Renderer>();
+                    if (renderer != null)
+                    {
+                        renderer.material.color = originalPlayerColors[playerName];
+                    }
+                }
             }
             else
             {
@@ -182,8 +214,27 @@ public class PlayerMovement : MonoBehaviour
                 previousPlayerHealth[playerName] = 100;
                 playerAliveState[playerName] = true;
 
+                Renderer renderer = newPlayerObject.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    originalPlayerColors[playerName] = renderer.material.color;
+                }
+
                 // Start the movement coroutine for this new player
                 playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(newPlayerObject, targetPosition, targetRotation));
+            }
+        }
+
+        // Apply the new scales to the player objects
+        foreach (var kvp in newPlayerScales)
+        {
+            string playerName = kvp.Key;
+            Vector3 targetScale = kvp.Value;
+
+            if (playerGameObjects.ContainsKey(playerName))
+            {
+                GameObject playerObject = playerGameObjects[playerName];
+                playerObject.transform.localScale = targetScale;
             }
         }
     }
@@ -215,10 +266,9 @@ public class PlayerMovement : MonoBehaviour
         if (renderer == null)
             yield break;
 
-        Color originalColor = renderer.material.color;
+        Color originalColor = originalPlayerColors[playerObject.name];
         renderer.material.color = damageFlashColor;
         yield return new WaitForSeconds(flashDuration);
         renderer.material.color = originalColor;
     }
 }
-
