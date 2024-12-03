@@ -90,21 +90,21 @@ public class Player3DMovement : MonoBehaviour
             float fx = float.Parse(forwardCoords[0], System.Globalization.CultureInfo.InvariantCulture);
             float fz = float.Parse(forwardCoords[1], System.Globalization.CultureInfo.InvariantCulture);
             float fy = float.Parse(forwardCoords[2], System.Globalization.CultureInfo.InvariantCulture);
-            Vector3 forward = new Vector3(fx, fz, fy);
+            Vector3 forward = new Vector3(fx, fy, fz);
 
             forward = parent.rotation * forward;
-
-            Quaternion targetRotation = Quaternion.LookRotation(forward, Vector3.up);
-            targetRotation = Quaternion.Euler(targetRotation.eulerAngles.x, targetRotation.eulerAngles.y, targetRotation.eulerAngles.z);
-            newPlayerRotations[playerName] = targetRotation;
 
 
             // Store player data
             newPlayerPositions[playerName] = position;
             newPlayerTeams[playerName] = team;
             newPlayerForward[playerName] = forward;
-
             previousPlayerHealth[playerName] = currentHealth;
+
+
+            Quaternion targetRotation = Quaternion.LookRotation(forward, Vector3.up);
+            targetRotation = Quaternion.Euler(targetRotation.eulerAngles.x, targetRotation.eulerAngles.y, targetRotation.eulerAngles.z);
+            newPlayerRotations[playerName] = targetRotation;
 
             // Check if the player is dead
             if (currentHealth <= 0)
