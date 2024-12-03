@@ -3,6 +3,7 @@ using UnityEngine;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using System;
+using TMPro;
 
 public class Player3DMovement : MonoBehaviour
 {
@@ -113,6 +114,7 @@ public class Player3DMovement : MonoBehaviour
             string playerName = kvp.Key;
             Vector3 targetPosition = kvp.Value;
             string team = newPlayerTeams[playerName];
+            int currentHealth = previousPlayerHealth[playerName]; // Get the current health
 
             if (playerGameObjects.ContainsKey(playerName))
             {
@@ -130,6 +132,13 @@ public class Player3DMovement : MonoBehaviour
                     StopCoroutine(playerMoveCoroutines[playerName]);
                 }
                 playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(playerObject, targetPosition));
+
+                // Update the TextMeshPro text with the current health
+                TextMeshPro textMeshPro = playerObject.GetComponentInChildren<TextMeshPro>();
+                if (textMeshPro != null)
+                {
+                    textMeshPro.text = $"{playerName}({currentHealth})";
+                }
             }
             else
             {
@@ -141,7 +150,13 @@ public class Player3DMovement : MonoBehaviour
                 newPlayerObject.name = playerName;
                 playerGameObjects[playerName] = newPlayerObject;
 
-                previousPlayerHealth[playerName] = 100;
+                TextMeshPro textMeshPro = newPlayerObject.GetComponentInChildren<TextMeshPro>();
+                if (textMeshPro != null)
+                {
+                    textMeshPro.text = $"{playerName} ({currentHealth} HP)";
+                }
+
+                previousPlayerHealth[playerName] = currentHealth;
                 playerAliveState[playerName] = true;
 
                 // Start the movement coroutine for this new player
