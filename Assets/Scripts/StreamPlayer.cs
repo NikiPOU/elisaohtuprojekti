@@ -1,14 +1,19 @@
 using UnityEngine;
 using UnityEngine.Video;
 
-public class StreamPlayer : MonoBehaviour
+public class PlayLocalVideo : MonoBehaviour
 {
     public VideoPlayer videoPlayer;
 
     void Start()
     {
-        videoPlayer.url = "https://www.youtube.com/watch?v=ebcrEHPEZKg"; // Use a direct HLS or DASH URL
+        if (videoPlayer == null)
+        {
+            Debug.LogError("VideoPlayer component is missing!");
+            return;
+        }
+
+        // Play the video
         videoPlayer.Play();
     }
 }
-
