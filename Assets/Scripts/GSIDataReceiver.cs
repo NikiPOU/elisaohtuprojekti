@@ -7,9 +7,10 @@ public class GSIDataReceiver : MonoBehaviour
 {
     public string statisticsData; // Stores data from the first address
     public string positionsData; // Stores data from the second address
-
+    public string matchData;
     public event Action<string> OnStatisticsDataReceived; // Event for the first data source
     public event Action<string> OnPositionsDataReceived; // Event for the second data source
+    public event Action<string> OnMatchDataReceived;
 
     private void Start()
     {
@@ -22,6 +23,11 @@ public class GSIDataReceiver : MonoBehaviour
         StartCoroutine(GetGSIData("https://gsi-ohtuprojekti-staging.apps.ocp-test-0.k8s.it.helsinki.fi/player_positions", data => {
             positionsData = data;
             OnPositionsDataReceived?.Invoke(positionsData); // Invoke event for the second data
+        }));
+
+        StartCoroutine(GetGSIData("https://gsi-ohtuprojekti-staging.apps.ocp-test-0.k8s.it.helsinki.fi/match_data", data => {
+            matchData = data;
+            OnMatchDataReceived?.Invoke(matchData);
         }));
     }
 
