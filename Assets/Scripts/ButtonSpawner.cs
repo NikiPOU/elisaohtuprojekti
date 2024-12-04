@@ -75,7 +75,7 @@ public class ButtonSpawner : MonoBehaviour
                 Button newButton = Instantiate(buttonPrefab, buttonParent);
                 
                 Vector3 newPosition = newButton.transform.localPosition;
-                newPosition.x += i * 0.75f; // Jokainen nappi 0,75 välillä edelliseen
+                newPosition.x += i * 0.8f; // Jokainen nappi 0,75 välillä edelliseen
                 newButton.transform.localPosition = newPosition;
 
                 TextMeshProUGUI buttonText = newButton.GetComponentInChildren<TextMeshProUGUI>();
