@@ -5344,6 +5344,7 @@ MonoBehaviour:
   terroristPrefab: {fileID: 8826551056088235091, guid: b8e93d3ce9e4fdf4ebbd94f267f12ff2,
     type: 3}
   parent: {fileID: 1545198566}
+  map: {fileID: 0}
   lerpDuration: 0.3
 --- !u!4 &807347757
 Transform:
@@ -5422,7 +5423,7 @@ VideoPlayer:
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 00
   m_ControlledAudioTrackCount: 1
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_SkipOnDrop: 1
   m_Looping: 0
   m_WaitForFirstFrame: 1
