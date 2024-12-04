@@ -10330,6 +10330,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   videoPlayer: {fileID: 810017834}
+  gsiDataReceiver: {fileID: 0}
 --- !u!328 &1623456330
 VideoPlayer:
   m_ObjectHideFlags: 0
@@ -10360,7 +10361,7 @@ VideoPlayer:
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 00
   m_ControlledAudioTrackCount: 1
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_SkipOnDrop: 1
   m_Looping: 0
   m_WaitForFirstFrame: 1
