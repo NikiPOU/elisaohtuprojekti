@@ -19,6 +19,8 @@ class DataEncoding:
         match_data = {}
         match_data["map"] = data["match_data"]["map"]
         match_data["round"] = data["match_data"]["round"]
+        match_data["score_ct"] = data["match_data"]["score_ct"]
+        match_data["score_t"] = data["match_data"]["score_t"]
         self.write_json_file(match_data, "match_data.json")
     
     def write_json_file(self, data: dict, file_name: str):

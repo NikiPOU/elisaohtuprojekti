@@ -34,6 +34,8 @@ class DataProcessor:
                 }
             self.game_data["match_data"]["map"] = data["map"]["name"]
             self.game_data["match_data"]["round"] = data["map"]["round"]
+            self.game_data["match_data"]["score_ct"] = data["map"]["team_ct"]["score"]
+            self.game_data["match_data"]["score_t"] = data["map"]["team_t"]["score"]
 
             # Game data syötetään encodingiin ja tietokantaan laitettavaksi
             self.data_encoder.create_json_file(self.game_data)
