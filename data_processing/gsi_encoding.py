@@ -1,20 +1,23 @@
 import json
 
 class DataEncoding:
-    '''A class that encodes and saves data
+    '''
+    A class that encodes and saves data
     into different JSON files based on the content of the data.
     '''
 
     def create_json_file(self, data: dict):
-        '''A method that processes a dictionary containing gsi data.
+        '''
+        A method that processes a dictionary containing gsi data.
         This method also extracts parts of the data and saves them 
         into different JSON files accordingly.
         
         Args: 
-            data: 
-                Is a dictionary containing nested gsi data, 
-                which is information about CS game, 
-                like player name, player health, kda and match statistics etc'''
+        data: 
+            Is a dictionary containing nested gsi data, 
+            which is information about CS game, 
+            like player name, player health, kda and match statistics etc
+        '''
 
 
         position_data = {}
@@ -39,9 +42,9 @@ class DataEncoding:
         and writes it to a specified file.
 
         Args:
-            data: 
+        data: 
                 The dictionary to be made into JSON.
-            file_name: 
+        file_name: 
                 The name of the file where the 
                 JSON data will be saved.
 

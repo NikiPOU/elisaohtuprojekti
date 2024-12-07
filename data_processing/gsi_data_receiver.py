@@ -16,8 +16,8 @@ class DataReceiver:
     def get_gsi_data(self, data):
         '''Receives and process GSI data.
         Args: 
-            data: 
-                GSI data that is processed by the DataProcessor.
+        data: 
+            GSI data that is processed by the DataProcessor.
         '''
 
         self.data_processor.parse_data(data)
