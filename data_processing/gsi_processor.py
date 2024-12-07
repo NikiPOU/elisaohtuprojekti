@@ -2,12 +2,37 @@ from gsi_encoding import DataEncoding
 from database_updator import DatabaseUpdator
 
 class DataProcessor:
+    '''A class that sorts only needed information from 
+    given data and adds it to a dictionary. 
+    Then it goes to encoding and is saved in database.
+
+    Attributes:
+        DataEncoding:
+            An instance of the DataEncoding class 
+            used for encoding and saving     
+            the processed GSI data into JSOn file.
+        DatabaseUpdator: 
+            An instance of the DatabaseUpdator 
+            class used for updating the database.
+'''
+
     def __init__(self):
+        '''Initializes the DataProcessor instance. 
+        Also sets up instances of dataEncoding and DatabaseUpdator.
+        '''
         self.data_encoder = DataEncoding()
         self.database_updator = DatabaseUpdator()
     
     def parse_data(self, data: dict):
-        # Tekee gsi-datasta uuden sanakirjan, jossa on vain tarvittava data
+        '''Sorts and processes raw GSI data 
+        and extracts relevant match and player information into a dict. 
+        Also passes it to the DataEncoding and 
+        DatabaseUpdator modules for further handling.
+
+        Args: 
+            data: 
+                dictionary that contains the raw gsi data from CS game.
+        '''
         try:
             self.game_data = {"player_data": {}, "match_data": {}}
             players = data["allplayers"]
@@ -35,7 +60,6 @@ class DataProcessor:
             self.game_data["match_data"]["map"] = data["map"]["name"]
             self.game_data["match_data"]["round"] = data["map"]["round"]
 
-            # Game data syötetään encodingiin ja tietokantaan laitettavaksi
             self.data_encoder.create_json_file(self.game_data)
             self.database_updator.update_database(self.game_data)
             

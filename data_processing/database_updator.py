@@ -3,7 +3,9 @@ from db import db
 
 class DatabaseUpdator:
     def __init__(self):
-        # Tässä saadaan tietokantayhteys, mutta pitäisi toteuttaa toisella tavalla niin, ettei koko metodia kutsuta "uudelleen"
+        '''A class that tests if data can be added to the database.'''
+
+
         pass
 
     def update_database(self, data: dict):
