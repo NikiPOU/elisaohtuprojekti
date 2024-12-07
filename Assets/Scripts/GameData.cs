@@ -5,10 +5,20 @@ using UnityEngine;
 using TMPro;
 using Newtonsoft.Json.Linq;
 
+/// <summary>
+/// Handles the display and management of player statistics based on received GSI data.
+/// </summary> public class Statistics : MonoBehaviour
+
 public class Statistics : MonoBehaviour
 {
-    public TMP_Text text; // TextMeshPro component
-    public GSIDataReceiver gsiDataReceiver; // GSIDataReceiver script component
+    /// <summary> 
+    /// The TextMeshPro component used to display statistics on the UI.
+    /// </summary>
+    public TMP_Text text;
+    /// <summary> 
+    /// The GSIDataReceiver component responsible for receiving GSI data updates. 
+    /// </summary
+    public GSIDataReceiver gsiDataReceiver;
     private DataTable cTerroristTable;
     private DataTable terroristTable;
 
