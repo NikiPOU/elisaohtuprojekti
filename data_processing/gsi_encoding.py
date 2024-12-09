@@ -13,7 +13,7 @@ class DataEncoding:
         statistics = {}
         for steam_id, player_data in data["player_data"].items():
             statistics[steam_id] = player_data["name"], player_data["team"], player_data["health"],\
-            player_data["kills"], player_data["assists"], player_data["deaths"]
+            player_data["kills"], player_data["assists"], player_data["deaths"], player_data["kdr"]
         self.write_json_file(statistics, "statistics.json")
 
         match_data = {}

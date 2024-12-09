@@ -21,6 +21,11 @@ class DataProcessor:
                 deaths = player["match_stats"]["deaths"]
                 forward = player["forward"]
                 
+                if deaths != 0:
+                    kdr = kills / deaths
+                else:
+                    kdr = kills
+                kdr = round(kdr, 2)
 
                 self.game_data["player_data"][steam_id] = {
                     "name": name,
@@ -30,7 +35,8 @@ class DataProcessor:
                     "kills": kills,
                     "assists": assists,
                     "deaths": deaths,
-                    "forward": forward
+                    "forward": forward,
+                    "kdr": kdr
                 }
             self.game_data["match_data"]["map"] = data["map"]["name"]
             self.game_data["match_data"]["round"] = data["map"]["round"]
