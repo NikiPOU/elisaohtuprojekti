@@ -25,7 +25,7 @@ class DataProcessor:
                     kdr = kills / deaths
                 else:
                     kdr = kills
-                kdr = round(kdr, 2)
+                kdr = f"{kdr:.2f}"
 
                 self.game_data["player_data"][steam_id] = {
                     "name": name,
