@@ -5,10 +5,20 @@ using UnityEngine;
 using TMPro;
 using Newtonsoft.Json.Linq;
 
+/// <summary>
+/// Handles the display and management of player statistics based on received GSI data.
+/// </summary> public class Statistics : MonoBehaviour
+
 public class Statistics : MonoBehaviour
 {
-    public TMP_Text text; // TextMeshPro component
-    public GSIDataReceiver gsiDataReceiver; // GSIDataReceiver script component
+    /// <summary> 
+    /// The TextMeshPro component used to display statistics on the UI.
+    /// </summary>
+    public TMP_Text text;
+    /// <summary> 
+    /// The GSIDataReceiver component responsible for receiving GSI data updates. 
+    /// </summary
+    public GSIDataReceiver gsiDataReceiver;
     private DataTable cTerroristTable;
     private DataTable terroristTable;
 
@@ -91,8 +101,9 @@ public class Statistics : MonoBehaviour
             string kills = playerData[3]?.ToString() ?? "0";
             string assists = playerData[4]?.ToString() ?? "0";
             string deaths = playerData[5]?.ToString() ?? "0";
+            string kdr = playerData[6]?.ToString() ?? "0.00";
 
-            AddStatistics(playerName, team, kills, deaths, assists, health);
+            AddStatistics(playerName, team, kills, deaths, assists, health, kdr);
         }
 
         string cTerroristsString = ConvertTableToString(cTerroristTable, true); // Include headers for CT
@@ -106,31 +117,32 @@ public class Statistics : MonoBehaviour
         DataTable dataTable = new DataTable(tableName);
 
         dataTable.Columns.Add("Name", typeof(string));
-        dataTable.Columns.Add("Kills", typeof(int));
-        dataTable.Columns.Add("Deaths", typeof(int));
-        dataTable.Columns.Add("Assists", typeof(int));
-        dataTable.Columns.Add("Health", typeof(int));
+        dataTable.Columns.Add("Kills", typeof(string));
+        dataTable.Columns.Add("Deaths", typeof(string));
+        dataTable.Columns.Add("Assists", typeof(string));
+        dataTable.Columns.Add("Health", typeof(string));
+        dataTable.Columns.Add("KDR", typeof(string));
 
         return dataTable;
     }
 
 
-    void AddStatistics(string name, string team, string kills, string deaths, string assists, string health)
+    void AddStatistics(string name, string team, string kills, string deaths, string assists, string health, string kdr)
     {
         if (team == "CT")
         {
-            cTerroristTable.Rows.Add(name, kills, deaths, assists, health);
+            cTerroristTable.Rows.Add(name, kills, deaths, assists, health, kdr);
         }
         else
         {
-            terroristTable.Rows.Add(name, kills, deaths, assists, health);
+            terroristTable.Rows.Add(name, kills, deaths, assists, health, kdr);
         }
         
     }
 
     string ConvertTableToString(DataTable dataTable, bool includeHeaders)
     {
-        const int columnWidth = 10; // Define a fixed width for all columns
+        const int columnWidth = 9; // Define a fixed width for all columns
         string tableString = "";
 
         if (includeHeaders)
@@ -139,6 +151,7 @@ public class Statistics : MonoBehaviour
             // Add column headers
             foreach (DataColumn column in dataTable.Columns)
             {
+                tableString += (column.ColumnName == "KDR") ? " " : ""; 
                 tableString += column.ColumnName.PadRight(columnWidth); // Pad column headers
             }
             tableString += "\n\n";

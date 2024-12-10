@@ -1,6 +1,6 @@
-# Arkkitehtuurin suunnitelma
+# Plan for the Architecture
 
-## Arkkitehtuurikaavio
+## Architecture diagram
 ```mermaid
 architecture-beta
   group server(server)[Server]
@@ -25,14 +25,14 @@ architecture-beta
   
 ```
 
-## Suunnitelma
+## The plan
 
-### Serverin puoli
-Pelistä lähetetään dataa suoraan Openshiftiin, jolloin se on sovelluksen käytettävissä. GSI processor karsii datasta muun kuin sovelluksen tarvitseman datan. Karsinnan jälkeen data siirretään joko suoraan encoding-osioon ja/tai tallennetaan tietokantaan. Encoding muuttaa datan sellaiseen muotoon, että Unity pystyy käsittelemään sitä (JSON). Tietokannasta tuleva data menee myös encodingin läpi.
+### Server side
+The game sends data directly to Openshift where it is available to the app. GSI processor parses the data and removes unnecessary parts. After parsing the data is either moved directly to encoding and/or saved to database. Encoding changes the data into JSON so Unity can handle it. The data coming from the database also goes through the encoding.
 
-*Video ja data tulevat yhteiseen timeriin, jossa videon kuva ja data saadaan synkronisoitua. Ei ajankohtainen ominaisuus*
+*The video and data have a shared timer where the video feed and data can be synced. Not a current feature*
 
-### Clientin puoli
-Client on VR-lasit ja Unity. Serveri ja Unity saavat yhteyden WebSocketin avulla, jolloin data saadaan Unitylle käytettäväksi. Unityssä tapahtuu datan renderöinti VR-ympäristöön.
+### Client side
+The client includes the VR glasses and Unity. Currently Unity fetches the data from the Openshift address. *A websocket implementation as the connection was planned but not implemented.* After fetching the data, Unity renders it into the VR environment.
 
 

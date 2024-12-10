@@ -12,6 +12,8 @@ public class ButtonSpawner : MonoBehaviour
     private List<string> playerNames = new List<string>();
     private List<Button> buttons = new List<Button>();
 
+    private Button lastClickedButton = null; //keep track what button is being cliked
+
     void Start()
     {
         gsiDataReceiver = FindObjectOfType<GSIDataReceiver>();
@@ -97,11 +99,27 @@ public class ButtonSpawner : MonoBehaviour
         button.onClick.RemoveAllListeners();
 
         // Add a listener to call ButtonClicked with the player's name
-        button.onClick.AddListener(() => ButtonClicked(playerName));
+        button.onClick.AddListener(() => ButtonClicked(button, playerName));
     }
 
-    void ButtonClicked(string playerName)
+    void ButtonClicked(Button clickedButton, string playerName)
     {
+        if (lastClickedButton != null)
+        {
+            ColorBlock colors = lastClickedButton.colors;
+            colors.normalColor = Color.white; // Reset the color to the default one
+            Debug.Log("Normal color: " + colors.normalColor);
+            lastClickedButton.colors = colors;
+        }
+
+        // Set the clicked button to a selected color
+        ColorBlock clickedButtonColors = clickedButton.colors;
+        clickedButtonColors.normalColor = new Color(102/255f, 176/255f, 195/255f); // Tähän se mikä pysyy painettuna
+        clickedButton.colors = clickedButtonColors;
+
+        // Update the last clicked button reference
+        lastClickedButton = clickedButton;
+
         // Call the method in the other script (replace 'OtherScript' with the actual script name)
         HeatMapPlayerMovement HeatmapScript = FindObjectOfType<HeatMapPlayerMovement>();
         if (HeatmapScript != null)
