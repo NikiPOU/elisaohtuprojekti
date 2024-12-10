@@ -132,15 +132,16 @@ public class Statistics : MonoBehaviour
 
     string ConvertTableToString(DataTable dataTable, bool includeHeaders)
     {
-        const int columnWidth = 10; // Define a fixed width for all columns
+        const int columnWidth = 11; // Define a fixed width for all columns
         string tableString = "";
 
         if (includeHeaders)
         {
-            tableString += " ";
+            tableString += "  ";
             // Add column headers
             foreach (DataColumn column in dataTable.Columns)
             {
+                tableString += (column.ColumnName == "KDR") ? " " : ""; 
                 tableString += column.ColumnName.PadRight(columnWidth); // Pad column headers
             }
             tableString += "\n\n";
