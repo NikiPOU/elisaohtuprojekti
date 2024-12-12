@@ -2774,7 +2774,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 1623456328}
     m_Modifications:
     - target: {fileID: 1206049029141961498, guid: f00eef826bd09fc539c6818a2d9f49f3,
         type: 3}
@@ -2784,52 +2784,52 @@ PrefabInstance:
     - target: {fileID: 6626733152881415315, guid: f00eef826bd09fc539c6818a2d9f49f3,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.03415686
+      value: 0.13283035
       objectReference: {fileID: 0}
     - target: {fileID: 6626733152881415315, guid: f00eef826bd09fc539c6818a2d9f49f3,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.004932082
+      value: 0.034250796
       objectReference: {fileID: 0}
     - target: {fileID: 6626733152881415315, guid: f00eef826bd09fc539c6818a2d9f49f3,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.018721854
+      value: 0.13001375
       objectReference: {fileID: 0}
     - target: {fileID: 6626733152881415315, guid: f00eef826bd09fc539c6818a2d9f49f3,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.227
+      value: -0.09722093
       objectReference: {fileID: 0}
     - target: {fileID: 6626733152881415315, guid: f00eef826bd09fc539c6818a2d9f49f3,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.605
+      value: 0.08333199
       objectReference: {fileID: 0}
     - target: {fileID: 6626733152881415315, guid: f00eef826bd09fc539c6818a2d9f49f3,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.321
+      value: -5.888929
       objectReference: {fileID: 0}
     - target: {fileID: 6626733152881415315, guid: f00eef826bd09fc539c6818a2d9f49f3,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071068
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6626733152881415315, guid: f00eef826bd09fc539c6818a2d9f49f3,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.7071068
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 6626733152881415315, guid: f00eef826bd09fc539c6818a2d9f49f3,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 6626733152881415315, guid: f00eef826bd09fc539c6818a2d9f49f3,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 6626733152881415315, guid: f00eef826bd09fc539c6818a2d9f49f3,
         type: 3}
@@ -4865,7 +4865,7 @@ MonoBehaviour:
   m_ThresholdMoveRatioForScale: 0.05
   m_ClampScaling: 1
   m_MinimumScaleRatio: 0.15
-  m_MaximumScaleRatio: 2
+  m_MaximumScaleRatio: 10
   m_ScaleMultiplier: 0.25
 --- !u!114 &775221586
 MonoBehaviour:
@@ -10113,7 +10113,7 @@ MonoBehaviour:
   m_ThresholdMoveRatioForScale: 0.05
   m_ClampScaling: 1
   m_MinimumScaleRatio: 0.01
-  m_MaximumScaleRatio: 2
+  m_MaximumScaleRatio: 10
   m_ScaleMultiplier: 0.25
 --- !u!114 &1457875832
 MonoBehaviour:
@@ -10792,6 +10792,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 810017833}
+  - {fileID: 439041436}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!114 &1623456329
@@ -10815,7 +10816,7 @@ MonoBehaviour:
   m_ThresholdMoveRatioForScale: 0.05
   m_ClampScaling: 1
   m_MinimumScaleRatio: 0.15
-  m_MaximumScaleRatio: 2
+  m_MaximumScaleRatio: 10
   m_ScaleMultiplier: 0.25
 --- !u!114 &1623456330
 MonoBehaviour:
@@ -13691,7 +13692,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 0
   m_CollisionDetection: 2
 --- !u!114 &1950540510
 MonoBehaviour:
@@ -13714,7 +13715,7 @@ MonoBehaviour:
   m_ThresholdMoveRatioForScale: 0.05
   m_ClampScaling: 1
   m_MinimumScaleRatio: 0.01
-  m_MaximumScaleRatio: 2
+  m_MaximumScaleRatio: 10
   m_ScaleMultiplier: 0.25
 --- !u!114 &1950540511
 MonoBehaviour:
@@ -14112,7 +14113,7 @@ MonoBehaviour:
   m_ThresholdMoveRatioForScale: 0.05
   m_ClampScaling: 1
   m_MinimumScaleRatio: 0.01
-  m_MaximumScaleRatio: 2
+  m_MaximumScaleRatio: 10
   m_ScaleMultiplier: 0.25
 --- !u!114 &1960349500
 MonoBehaviour:
@@ -14772,7 +14773,7 @@ MonoBehaviour:
   m_UseOptimizedControls: 0
   m_LeftHandMesh: {fileID: 548011304}
   m_RightHandMesh: {fileID: 1096151326}
-  m_HandMeshMaterial: {fileID: 0}
+  m_HandMeshMaterial: {fileID: 2100000, guid: 3637b758ff163493f8bb8b6d7e96d7ae, type: 2}
   m_DrawMeshes: 1
   m_DebugDrawPrefab: {fileID: 6507399986997092475, guid: 254b742d65a15d14b9df756ae77de868,
     type: 3}
@@ -14807,7 +14808,7 @@ MonoBehaviour:
   m_ThresholdMoveRatioForScale: 0.05
   m_ClampScaling: 1
   m_MinimumScaleRatio: 0.01
-  m_MaximumScaleRatio: 2
+  m_MaximumScaleRatio: 10
   m_ScaleMultiplier: 0.25
 --- !u!114 &2055609319
 MonoBehaviour:
@@ -17241,4 +17242,3 @@ SceneRoots:
   - {fileID: 1602506945}
   - {fileID: 839515113}
   - {fileID: 807347757}
-  - {fileID: 439041435}
