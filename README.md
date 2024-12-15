@@ -33,6 +33,8 @@ In order to use this app, you need to fullfill the following requirements:
 - [Architecture diagram and documentation](https://github.com/NikiPOU/elisaohtuprojekti/blob/main/docs/architecture.md)
 ### Practices
 - [Definition of Done](https://github.com/NikiPOU/elisaohtuprojekti/blob/main/docs/definition_of_done.md)
+### For those wanting to continue this project
+- [Handover](https://github.com/NikiPOU/elisaohtuprojekti/blob/main/docs/handover.md)
 ### Client meetings
 - [Client meeting 0](https://github.com/NikiPOU/elisaohtuprojekti/blob/main/docs/client_meetings/client_meeting_0.md)
 - [Client meeting 1](https://github.com/NikiPOU/elisaohtuprojekti/blob/main/docs/client_meetings/client_meeting_1.md)
