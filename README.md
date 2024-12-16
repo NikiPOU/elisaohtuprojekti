@@ -23,7 +23,7 @@ In order to use this app, you need to fullfill the following requirements:
 ### Launching the app in Unity
 1. Clone this repository to your local device.
 2. Open the cloned project in Unity.
-3. Make sure you are connected to the University of Helsinki's network.
+3. Make sure you are connected to the University of Helsinki's network. [Steps to Connect to OpenVPN](https://helpdesk.it.helsinki.fi/kirjautuminen-ja-yhteydet/verkkoyhteydet/yhteydet-yliopiston-ulkopuolelta)
 4. Join a game in CS2 as a **spectator**.
 5. ?
 
