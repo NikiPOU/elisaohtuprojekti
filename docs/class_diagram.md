@@ -76,9 +76,9 @@ classDiagram
     GameData : +ConvertTableToString(dataTable, includeHeaders)
     
     class GameMenuManager
-    GameMenumanager : +Update
-    GameMenumanager : +ToggleMenu
-    GameMenumanager : +UpdateMenuPosition
+    GameMenuManager : +Update
+    GameMenuManager : +ToggleMenu
+    GameMenuManager : +UpdateMenuPosition
 
 
     Main --> App
