@@ -4,14 +4,30 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using System;
 
+/// <summary>
+/// Manages player objects, their positions, rotations, health, and visual effects.
+/// </summary>
 public class PlayerMovement : MonoBehaviour
 {
+    //Prefab for counter-Terrorist players.
     public GameObject counterTerroristPrefab;
+
+    //Prefab for Terrorist players.
     public GameObject terroristPrefab;
+
+    //Parent transform for organizing player objects.
     public Transform parent;
+
+    //Duration for smooth position and rotation transformations.
     public float lerpDuration = 0.3f;
+
+    //Color used for flash when a player takes damage.
     public Color damageFlashColor = Color.red;
+
+    //Duration of the damage flash.
     public float flashDuration = 0.2f;
+
+    //Internal state for organizing player objects and data.
     [NonSerialized] public Transform counterTerroristsParent;
     [NonSerialized] public Transform terroristsParent;
     private GSIDataReceiver gsiDataReceiver;
@@ -23,7 +39,9 @@ public class PlayerMovement : MonoBehaviour
     private Dictionary<string, Coroutine> playerFlashCoroutines = new Dictionary<string, Coroutine>();
     private Dictionary<string, Color> originalPlayerColors = new Dictionary<string, Color>();
     
-
+    /// <summary>
+    /// Initialize player positions and subscribe to GSI data updates.
+    /// </summary>
     void Start()
     {
         gsiDataReceiver = FindObjectOfType<GSIDataReceiver>();
@@ -37,6 +55,10 @@ public class PlayerMovement : MonoBehaviour
         gsiDataReceiver.OnPositionsDataReceived += UpdatePlayers;
     }
 
+
+    /// <summary>
+    /// Unsubscribe from GSI updates when the object is destroyed.
+    /// </summary>
     private void OnDestroy()
     {
         if (gsiDataReceiver != null)
@@ -45,6 +67,10 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Processes player GSI data and updates their positions, rotations, and states.
+    /// </summary>
+    /// <param name="jsonData">JSON string containing player data.</param>
     void UpdatePlayers(string jsonData)
     {
         JObject allPlayers = JObject.Parse(jsonData);
@@ -54,12 +80,13 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        // Store the new player data
+        //Store the new player data in dictionairies.
         Dictionary<string, Vector3> newPlayerPositions = new Dictionary<string, Vector3>();
         Dictionary<string, string> newPlayerTeams = new Dictionary<string, string>();
         Dictionary<string, Quaternion> newPlayerRotations = new Dictionary<string, Quaternion>();
         Dictionary<string, Vector3> newPlayerScales = new Dictionary<string, Vector3>();
 
+        //Parse player data.
         foreach (var property in ((JObject)allPlayers).Properties())
         {
             JArray playerData = (JArray)property.Value;
@@ -73,14 +100,14 @@ public class PlayerMovement : MonoBehaviour
             if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(team) || string.IsNullOrEmpty(positionString) || string.IsNullOrEmpty(forwardString))
                 continue;
 
-            // Parse position
+            //Parse position.
             string[] coords = positionString.Split(", ");
             float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
             float z_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
             float y_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
             Vector3 position = new Vector3(0.00059f * x_coord + 0.1f, 0.00059f * z_coord - 0.6f, -0.05f) + parent.position;
 
-            // Apply map rotation and scale to the position
+            //Apply map rotation and scale to the position.
             Vector3 initialScale = new Vector3(2.68f, 2.68f, 1f);
             Vector3 scaleFactor = new Vector3(
                 parent.localScale.x / initialScale.x,
@@ -89,34 +116,34 @@ public class PlayerMovement : MonoBehaviour
             );
             position = parent.rotation * Vector3.Scale(position - parent.position, scaleFactor) + parent.position;
 
-            // Parse forward vector
+            //Parse forward vector.
             string[] forwardCoords = forwardString.Split(", ");
             float fx = float.Parse(forwardCoords[0], System.Globalization.CultureInfo.InvariantCulture);
             float fz = float.Parse(forwardCoords[1], System.Globalization.CultureInfo.InvariantCulture);
             float fy = float.Parse(forwardCoords[2], System.Globalization.CultureInfo.InvariantCulture);
             Vector3 forward = new Vector3(fx, fz, fy);
 
-            // Apply map rotation to the forward vector
+            //Apply map rotation to the forward vector.
             forward = parent.rotation * forward;
 
 
-            // Store player data
+            //Store player data.
             newPlayerPositions[playerName] = position;
             newPlayerTeams[playerName] = team;
             newPlayerForward[playerName] = forward;
 
-            // Calculate target rotation
+            //Calculate target rotation.
             Quaternion targetRotation = Quaternion.LookRotation(forward, Vector3.up);
             targetRotation = Quaternion.Euler(targetRotation.eulerAngles.x, targetRotation.eulerAngles.y, 0f);
             newPlayerRotations[playerName] = targetRotation;
 
-            // Check for health
+            //Check for health.
             if (previousPlayerHealth.ContainsKey(playerName))
             {
                 int previousHealth = previousPlayerHealth[playerName];
                 if (currentHealth < previousHealth)
                 {
-                    // Player damaged
+                    //Player damage detection and effects handling.
                     if (playerGameObjects.ContainsKey(playerName))
                     {
                         GameObject playerObject = playerGameObjects[playerName];
@@ -133,7 +160,7 @@ public class PlayerMovement : MonoBehaviour
 
             previousPlayerHealth[playerName] = currentHealth;
 
-            // Check if the player is dead
+            //Check if the player is dead.
             if (currentHealth <= 0)
             {
                 playerAliveState[playerName] = false;
@@ -141,7 +168,7 @@ public class PlayerMovement : MonoBehaviour
                 if (playerGameObjects.ContainsKey(playerName))
                 {
                     GameObject playerObject = playerGameObjects[playerName];
-                    playerObject.SetActive(false); // Hide the player object
+                    playerObject.SetActive(false);
                 }
             }
             else
@@ -167,7 +194,7 @@ public class PlayerMovement : MonoBehaviour
             originalPlayerColors.Remove(playerName);
         }
 
-        // Create new players and update existing ones
+        //Create new players and update existing ones.
         foreach (var kvp in newPlayerPositions)
         {
             string playerName = kvp.Key;
@@ -179,13 +206,13 @@ public class PlayerMovement : MonoBehaviour
             {
                 GameObject playerObject = playerGameObjects[playerName];
 
-                // If player is alive, set visibility
+                //If player is alive, set visibility.
                 if (playerAliveState[playerName])
                 {
                     playerObject.SetActive(true);
                 }
 
-                // Start or restart the movement coroutine for this player
+                //Start or restart the movement coroutine for this player.
                 if (playerMoveCoroutines.ContainsKey(playerName))
                 {
                     StopCoroutine(playerMoveCoroutines[playerName]);
@@ -203,7 +230,7 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                // If player doesn't exist -> make new player object
+                //If player doesn't exist -> make new player object.
                 GameObject prefab = (team == "CT") ? counterTerroristPrefab : terroristPrefab;
 
                 GameObject newPlayerObject = Instantiate(prefab, parent, false);
@@ -220,12 +247,12 @@ public class PlayerMovement : MonoBehaviour
                     originalPlayerColors[playerName] = renderer.material.color;
                 }
 
-                // Start the movement coroutine for this new player
+                //Start the movement coroutine for this new player.
                 playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(newPlayerObject, targetPosition, targetRotation));
             }
         }
 
-        // Apply the new scales to the player objects
+        //Apply the new scales to the player objects.
         foreach (var kvp in newPlayerScales)
         {
             string playerName = kvp.Key;
@@ -239,6 +266,10 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+
+    /// <summary>
+    /// Smoothly moves a player object to a new position and rotation.
+    /// </summary>
     private System.Collections.IEnumerator SmoothMove(GameObject playerObject, Vector3 targetPosition, Quaternion targetRotation)
     {
         float time = 0f;
@@ -247,18 +278,21 @@ public class PlayerMovement : MonoBehaviour
 
         while (time < lerpDuration)
         {
-            // Lerp from the start position to the target position over time
+            //Lerp from the start position to the target position over time.
             playerObject.transform.position = Vector3.Lerp(startPosition, targetPosition, time / lerpDuration);
             playerObject.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, time / lerpDuration);
             time += Time.deltaTime;
             yield return null;
         }
 
-        // Ensure the final position and rotation are set
+        //Ensure the final position and rotation are set.
         playerObject.transform.position = targetPosition;
         playerObject.transform.rotation = targetRotation;
     }
 
+    /// <summary>
+    /// Temporarily changes a player's color when they take damage.
+    /// </summary>
     private System.Collections.IEnumerator FlashColor(GameObject playerObject)
     {
         Renderer renderer = playerObject.GetComponent<Renderer>();

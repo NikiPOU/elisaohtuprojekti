@@ -3,34 +3,76 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 
+
+/// <summary>
+/// Handles receiving data from the GSI (Game State Integration) endpoint.
+/// This script fetches data from multiple GSI endpoints.
+/// </summary>
 public class GSIDataReceiver : MonoBehaviour
 {
-    public string statisticsData; // Stores data from the first address
+    
+    /// <summary>
+    /// Stores data retrieved from the statistics endpoint.
+    /// </summary>
+    public string statisticsData;
+
+    /// <summary>
+    /// Stores data retrieved from the player positions endpoint.
+    /// </summary>
     public string positionsData; // Stores data from the second address
+
+
+    /// <summary>
+    /// Stores data retrieved from the match data endpoint.
+    /// </summary>
     public string matchData;
-    public event Action<string> OnStatisticsDataReceived; // Event for the first data source
-    public event Action<string> OnPositionsDataReceived; // Event for the second data source
+
+    /// <summary>
+    /// Event triggered when new data is received from the statistics endpoint.
+    /// </summary>
+    public event Action<string> OnStatisticsDataReceived;
+    
+    /// <summary>
+    /// Event triggered when new data is received from the player positions endpoint.
+    /// </summary>
+    public event Action<string> OnPositionsDataReceived;
+
+    /// <summary>
+    /// Event triggered when new data is received from the match data endpoint.
+    /// </summary>
     public event Action<string> OnMatchDataReceived;
 
+    /// <summary>
+    /// Unity's Start method, that is called imidiately when script is enabled.
+    /// Coroutines to fetch data from multiple endpoints.
+    /// </summary>
     private void Start()
     {
         // Start coroutines for each endpoint
         StartCoroutine(GetGSIData("https://gsi-ohtuprojekti-staging.apps.ocp-test-0.k8s.it.helsinki.fi/statistics", data => {
             statisticsData = data;
-            OnStatisticsDataReceived?.Invoke(statisticsData); // Invoke event for the first data
+            OnStatisticsDataReceived?.Invoke(statisticsData); // Invoke event for statistics data
         }));
 
         StartCoroutine(GetGSIData("https://gsi-ohtuprojekti-staging.apps.ocp-test-0.k8s.it.helsinki.fi/player_positions", data => {
             positionsData = data;
-            OnPositionsDataReceived?.Invoke(positionsData); // Invoke event for the second data
+            OnPositionsDataReceived?.Invoke(positionsData); // Invoke event for positions data
         }));
 
         StartCoroutine(GetGSIData("https://gsi-ohtuprojekti-staging.apps.ocp-test-0.k8s.it.helsinki.fi/match_data", data => {
             matchData = data;
-            OnMatchDataReceived?.Invoke(matchData);
+            OnMatchDataReceived?.Invoke(matchData); // Invoke event for match data
         }));
     }
 
+
+
+    /// <summary>
+    /// Coroutine to fetch data from a given URI at regular intervals.
+    /// </summary>
+    /// <param name="uri">The endpoint URI to fetch data from.</param>
+    /// <param name="onDataReceived">Callback action to handle the received data.</param>
+    /// <returns>An IEnumerator for the coroutine.</returns>
     private IEnumerator GetGSIData(string uri, Action<string> onDataReceived)
     {
         while (true)
@@ -53,7 +95,7 @@ public class GSIDataReceiver : MonoBehaviour
                 }
             }
 
-            yield return new WaitForSeconds(0.1f); // Wait before the next request
+            yield return new WaitForSeconds(0.1f); // Wait 0.1 seconds before the next request
         }
     }
 }

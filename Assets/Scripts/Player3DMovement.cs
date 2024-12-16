@@ -5,13 +5,41 @@ using System.Linq;
 using System;
 using TMPro;
 
+
+/// <summary>
+/// Dynamically handles the movement, rotation, health display, and lifecycle of player GameObjects.
+/// Updates player states based on JSON data received from GSIDataReceiver.
+/// </summary>
 public class Player3DMovement : MonoBehaviour
 {
+    /// <summary>
+    /// Prefab representing a counter-terrorist player.
+    /// </summary>
     public GameObject counterTerroristPrefab;
+
+    /// <summary>
+    /// Prefab representing a terrorist player.
+    /// </summary>
     public GameObject terroristPrefab;
+
+    /// <summary>
+    /// The parent transform to which all player GameObjects are attached.
+    /// </summary>
     public Transform parent;
+    
+    /// <summary>
+    /// The map transform, used for scaling and positioning player objects.
+    /// </summary>
     public Transform map;
+
+    /// <summary>
+    /// The duration (in seconds) for interpolating player movement and rotation.
+    /// </summary>
     public float lerpDuration = 0.3f;
+
+    /// <summary>
+    /// Private fields for managing code.
+    /// </summary>
     private GSIDataReceiver gsiDataReceiver;
     private Dictionary<string, GameObject> playerGameObjects = new Dictionary<string, GameObject>();
     private Dictionary<string, int> previousPlayerHealth = new Dictionary<string, int>();
@@ -19,6 +47,9 @@ public class Player3DMovement : MonoBehaviour
     private Dictionary<string, Coroutine> playerMoveCoroutines = new Dictionary<string, Coroutine>();
     private Dictionary<string, Vector3> newPlayerForward = new Dictionary<string, Vector3>();
 
+    /// <summary>
+    /// Initializes the GSIDataReceiver and subscribes to its data event.
+    /// </summary>
     void Start()
     {
         gsiDataReceiver = FindObjectOfType<GSIDataReceiver>();
@@ -32,6 +63,9 @@ public class Player3DMovement : MonoBehaviour
         gsiDataReceiver.OnPositionsDataReceived += UpdatePlayers;
     }
 
+    /// <summary>
+    /// Unsubscribes from the GSIDataReceiver event.
+    /// </summary>
     private void OnDestroy()
     {
         if (gsiDataReceiver != null)
@@ -40,6 +74,11 @@ public class Player3DMovement : MonoBehaviour
         }
     }
 
+
+    /// <summary>
+    /// Processes the JSON GSI data to update player positions, rotations, and states.
+    /// </summary>
+    /// <param name="jsonData">JSON string containing player data.</param>
     void UpdatePlayers(string jsonData)
     {
         JObject allPlayers = JObject.Parse(jsonData);
@@ -59,6 +98,7 @@ public class Player3DMovement : MonoBehaviour
         {
             JArray playerData = (JArray)property.Value;
 
+            // Extract player details from JSON data.
             string positionString = playerData[0]?.ToString();
             string playerName = playerData[1]?.ToString();
             string team = playerData[2]?.ToString();
@@ -68,6 +108,7 @@ public class Player3DMovement : MonoBehaviour
             if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(team) || string.IsNullOrEmpty(positionString))
                 continue;
 
+            // Calculate the player's position based on map and parent transforms.
             string[] coords = positionString.Split(", ");
             float x_coord = float.Parse(coords[0], System.Globalization.CultureInfo.InvariantCulture);
             float z_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
@@ -85,7 +126,7 @@ public class Player3DMovement : MonoBehaviour
             position = parent.rotation * Vector3.Scale(position - parent.position, scaleFactor) + parent.position;
             Debug.Log(map.localScale);
 
-
+            // Calculate forward direction.
             string[] forwardCoords = forwardString.Split(", ");
             float fx = float.Parse(forwardCoords[0], System.Globalization.CultureInfo.InvariantCulture);
             float fz = float.Parse(forwardCoords[1], System.Globalization.CultureInfo.InvariantCulture);
@@ -95,7 +136,7 @@ public class Player3DMovement : MonoBehaviour
             forward = parent.rotation * forward;
 
 
-            // Store player data
+            // Store player data.
             newPlayerPositions[playerName] = position;
             newPlayerTeams[playerName] = team;
             newPlayerForward[playerName] = forward;
@@ -106,7 +147,7 @@ public class Player3DMovement : MonoBehaviour
             targetRotation = Quaternion.Euler(targetRotation.eulerAngles.x, targetRotation.eulerAngles.y, targetRotation.eulerAngles.z);
             newPlayerRotations[playerName] = targetRotation;
 
-            // Check if the player is dead
+            // Check if the player is dead and manage its visibility.
             if (currentHealth <= 0)
             {
                 playerAliveState[playerName] = false;
@@ -114,7 +155,7 @@ public class Player3DMovement : MonoBehaviour
                 if (playerGameObjects.ContainsKey(playerName))
                 {
                     GameObject playerObject = playerGameObjects[playerName];
-                    playerObject.SetActive(false); // Hide the player object
+                    playerObject.SetActive(false); // Hide the player object.
                 }
             }
             else
@@ -123,7 +164,7 @@ public class Player3DMovement : MonoBehaviour
             }
         }
 
-        // Remove old players who are not in the new data
+        // Remove old players who are not in the new data.
         var playersToRemove = playerGameObjects.Keys.Except(newPlayerPositions.Keys).ToList();
         foreach (string playerName in playersToRemove)
         {
@@ -139,33 +180,33 @@ public class Player3DMovement : MonoBehaviour
             playerAliveState.Remove(playerName);
         }
 
-        // Create new players and update existing ones
+        // Create new players and update existing ones.
         foreach (var kvp in newPlayerPositions)
         {
             string playerName = kvp.Key;
             Vector3 targetPosition = kvp.Value;
             string team = newPlayerTeams[playerName];
-            int currentHealth = previousPlayerHealth[playerName]; // Get the current health
+            int currentHealth = previousPlayerHealth[playerName]; // Get the current health.
             Quaternion targetRotation = newPlayerRotations[playerName];
 
             if (playerGameObjects.ContainsKey(playerName))
             {
                 GameObject playerObject = playerGameObjects[playerName];
 
-                // If player is alive, set visibility
+                // If player is alive, set visibility.
                 if (playerAliveState[playerName])
                 {
                     playerObject.SetActive(true);
                 }
 
-                // Start or restart the movement coroutine for this player
+                // Start or restart the movement coroutine for this player.
                 if (playerMoveCoroutines.ContainsKey(playerName))
                 {
                     StopCoroutine(playerMoveCoroutines[playerName]);
                 }
                 playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(playerObject, targetPosition, targetRotation));
 
-                // Update the TextMeshPro text with the current health
+                // Update the TextMeshPro text with the current health.
                 TextMeshPro textMeshPro = playerObject.GetComponentInChildren<TextMeshPro>();
                 if (textMeshPro != null)
                 {
@@ -174,7 +215,7 @@ public class Player3DMovement : MonoBehaviour
             }
             else
             {
-                // If player doesn't exist -> make new player object
+                // If player doesn't exist -> make new player object.
                 GameObject prefab = (team == "CT") ? counterTerroristPrefab : terroristPrefab;
 
                 GameObject newPlayerObject = Instantiate(prefab, parent, false);
@@ -191,12 +232,12 @@ public class Player3DMovement : MonoBehaviour
                 previousPlayerHealth[playerName] = currentHealth;
                 playerAliveState[playerName] = true;
 
-                // Start the movement coroutine for this new player
+                // Start the movement coroutine for this new player.
                 playerMoveCoroutines[playerName] = StartCoroutine(SmoothMove(newPlayerObject, targetPosition, targetRotation));
             }
         }
 
-        // Apply the new scales to the player objects
+        // Apply the new scales to the player objects.
         foreach (var kvp in newPlayerScales)
         {
             string playerName = kvp.Key;
@@ -210,6 +251,13 @@ public class Player3DMovement : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Smoothly moves and rotates a player object to the target position and rotation.
+    /// </summary>
+    /// <param name="playerObject">The player GameObject to move.</param>
+    /// <param name="targetPosition">The target position.</param>
+    /// <param name="targetRotation">The target rotation.</param>
+    /// <returns>IEnumerator for coroutine handling.</returns>
     private System.Collections.IEnumerator SmoothMove(GameObject playerObject, Vector3 targetPosition, Quaternion targetRotation)
     {
         float time = 0f;
@@ -218,14 +266,14 @@ public class Player3DMovement : MonoBehaviour
 
         while (time < lerpDuration)
         {
-            // Lerp from the start position to the target position over time
+            // Interpolate position and rotation.
             playerObject.transform.position = Vector3.Lerp(startPosition, targetPosition, time / lerpDuration);
             playerObject.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, time / lerpDuration);
             time += Time.deltaTime;
             yield return null;
         }
 
-        // Ensure the final position is set
+        // Ensure the final position is set.
         playerObject.transform.position = targetPosition;
         playerObject.transform.rotation = targetRotation;
     }

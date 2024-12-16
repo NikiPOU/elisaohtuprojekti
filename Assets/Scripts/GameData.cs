@@ -19,10 +19,20 @@ public class Statistics : MonoBehaviour
     /// The GSIDataReceiver component responsible for receiving GSI data updates. 
     /// </summary
     public GSIDataReceiver gsiDataReceiver;
+
+    /// <summary>
+    /// Table to store statistics for Counter-Terrorist players.
+    /// </summary>
     private DataTable cTerroristTable;
+
+    /// <summary>
+    /// Table to store statistics for Terrorist players.
+    /// </summary>
     private DataTable terroristTable;
 
-    // Initialize method for testing
+    /// <summary>
+    /// Initializes the script for testing purposes.
+    /// </summary>
     public void Initialize()
     {
         if (text == null)
@@ -30,19 +40,22 @@ public class Statistics : MonoBehaviour
             Debug.LogError("Ei toimi: Teksti-komponentti puuttuu.");
             return;
         }
-
-        text.text = "Game statistics here"; // Set the default text
+        // Default placeholder text
+        text.text = "Game statistics here";
     }
 
+    /// <summary>
+    /// Unity's Start method initializes tables and subscribes to GSI data updates.
+    /// </summary>
     void Start()
     {
-        // Check TMP_Text assignment and log an error if necessary
+        // Ensure the TextMeshPro text component is assigned
         if (text == null)
         {
             Debug.LogError("Teksti komponentissa ongelma");
             return; //Exit if TMP text component is empty
         }
-
+        // Find the GSIDataReceiver in the scene
         gsiDataReceiver = FindObjectOfType<GSIDataReceiver>();
         if (gsiDataReceiver == null)
         {
@@ -50,12 +63,18 @@ public class Statistics : MonoBehaviour
             return; //Exit if GSI data receiver is nout found
         }
 
+        // Create separate tables for both teams
         cTerroristTable = CreateTable("Counterterrorists");
         terroristTable = CreateTable("Terrorists");
 
+       // Subscribe to the data update event
         gsiDataReceiver.OnStatisticsDataReceived += StatisticsUpdate;
     }
 
+
+    /// <summary>
+    /// Ensures that the event subscription is removed when the object is destroyed.
+    /// </summary>
     private void OnDestroy()
     {
         if (gsiDataReceiver != null)
@@ -64,10 +83,16 @@ public class Statistics : MonoBehaviour
         }
     }
 
+
+    /// <summary>
+    /// Updates player statistics on receiving new GSI data.
+    /// </summary>
+    /// <param name="jsonData">JSON string containing updated statistics.</param>
     void StatisticsUpdate(string jsonData)
     {
         if (gsiDataReceiver != null && text != null)
         {
+            // Clear previous UI content and data
             text.text = "";
             cTerroristTable.Clear();
             terroristTable.Clear();
@@ -77,6 +102,12 @@ public class Statistics : MonoBehaviour
         }
     }
 
+
+    /// <summary>
+    /// Parses the GSI JSON data and fills team statistics tables.
+    /// </summary>
+    /// <param name="jsonData">JSON data string.</param>
+    /// <returns>Formatted string representation of player statistics.</returns>
     string ParseGSI(string jsonData)
     {
         JObject allPlayers = JObject.Parse(jsonData); // Parse JSON using Newtonsoft
@@ -103,19 +134,27 @@ public class Statistics : MonoBehaviour
             string deaths = playerData[5]?.ToString() ?? "0";
             string kdr = playerData[6]?.ToString() ?? "0.00";
 
+            // Add player data to the appropriate team's table
             AddStatistics(playerName, team, kills, deaths, assists, health, kdr);
         }
 
+        // Convert the tables to strings
         string cTerroristsString = ConvertTableToString(cTerroristTable, true); // Include headers for CT
         string terroristString = ConvertTableToString(terroristTable, false); // Exclude headers for Terrorists
         return "\n" + cTerroristsString + "\nCounter-Terrorists\n" + "\nTerrorists\n\n" + terroristString;
     }
 
 
+    /// <summary>
+    /// Creates a DataTable with columns for player statistics.
+    /// </summary>
+    /// <param name="tableName">Name of the table.</param>
+    /// <returns>A DataTable object initialized with the required columns.</returns>
     DataTable CreateTable(string tableName)
     {
         DataTable dataTable = new DataTable(tableName);
 
+        // Add columns for each player statistic
         dataTable.Columns.Add("Name", typeof(string));
         dataTable.Columns.Add("Kills", typeof(string));
         dataTable.Columns.Add("Deaths", typeof(string));
@@ -127,6 +166,16 @@ public class Statistics : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Adds a player's statistics to the appropriate team table.
+    /// </summary>
+    /// <param name="name">Player's name.</param>
+    /// <param name="team">Player's team ("CT" or "Terrorist").</param>
+    /// <param name="kills">Number of kills.</param>
+    /// <param name="deaths">Number of deaths.</param>
+    /// <param name="assists">Number of assists.</param>
+    /// <param name="health">Current health.</param>
+    /// <param name="kdr">Kill/Death Ratio.</param>
     void AddStatistics(string name, string team, string kills, string deaths, string assists, string health, string kdr)
     {
         if (team == "CT")
@@ -140,6 +189,13 @@ public class Statistics : MonoBehaviour
         
     }
 
+
+    /// <summary>
+    /// Converts a DataTable into a string for display.
+    /// </summary>
+    /// <param name="dataTable">The DataTable to convert.</param>
+    /// <param name="includeHeaders">Whether to include column headers in the output.</param>
+    /// <returns> string representation of the DataTable.</returns>
     string ConvertTableToString(DataTable dataTable, bool includeHeaders)
     {
         const int columnWidth = 9; // Define a fixed width for all columns

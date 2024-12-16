@@ -4,15 +4,33 @@ using UnityEngine;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 
+/// <summary>
+///Implementation of the heatmap.
+/// </summary>
 public class HeatMapPlayerMovement : MonoBehaviour
 {
+    //Receives data from GSI.
     public GSIDataReceiver gsiDataReceiver;
+
+    //The name of the player being tracked.
     public string playerName = null;
+
+    //The current position of the tracked player.
     public Vector3 position;
+
+    //The prefab used to create traces on the heatmap.
     public GameObject tracePrefab;
+
+    //Parent transform for all trace objects in the scene.
     public Transform parent;
+
+    //Dictionary to track the number of visits to each coordinate.
     Dictionary<string, int> coordinates = new Dictionary<string, int>();
+
+    //Dictionary to store the trace objects corresponding to each coordinate.
     Dictionary<string, GameObject> gameObjects = new Dictionary<string, GameObject>();
+
+    //Color gradients based on visit frequency.
     Dictionary<int, List<double>> colors = new Dictionary<int, List<double>>()
     {
         {5, new List<double> { 173, 216, 230, 0.8 }}, 
@@ -25,6 +43,9 @@ public class HeatMapPlayerMovement : MonoBehaviour
     };
 
 
+    /// <summary>
+    /// Subscribes to GSI data updates at the start of the script.
+    /// </summary>
     void Start()
     {
         gsiDataReceiver = FindObjectOfType<GSIDataReceiver>();
@@ -37,6 +58,9 @@ public class HeatMapPlayerMovement : MonoBehaviour
         gsiDataReceiver.OnPositionsDataReceived += UpdateTargetPosition;
     }
 
+    /// <summary>
+    /// Unsubscribes from GSI data updates when the script is destroyed.
+    /// </summary>
     private void OnDestroy()
     {
         if (gsiDataReceiver != null)
@@ -45,6 +69,9 @@ public class HeatMapPlayerMovement : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Creates a trace at the current position or updates an existing one with the correct color.
+    /// </summary>
     void LeaveTrace()
     {
         if (tracePrefab != null && position != Vector3.zero && playerName != null)
@@ -52,10 +79,13 @@ public class HeatMapPlayerMovement : MonoBehaviour
             Vector3 currentPosition = position; // Use the updated 'position'
             Color traceColor;
 
+            //Check if the position has already been visited
             if (coordinates.ContainsKey(currentPosition.ToString()))
             {
                 coordinates[currentPosition.ToString()] += 1;
                 Debug.Log(coordinates);
+
+                //Update the color if it exists in the color gradient
                 if (colors.ContainsKey(coordinates[currentPosition.ToString()]))
                 {
                     GameObject currentGameObject = gameObjects[currentPosition.ToString()];
@@ -69,6 +99,7 @@ public class HeatMapPlayerMovement : MonoBehaviour
             }
             else
             {
+                //Create a new trace at the position
                 coordinates.Add(currentPosition.ToString(), 1);
                 GameObject newTrace = Instantiate(tracePrefab, currentPosition, Quaternion.identity);
                 newTrace.transform.SetParent(parent);
@@ -79,6 +110,10 @@ public class HeatMapPlayerMovement : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Updates the player's position based on the JSON GSI data received.
+    /// </summary>
+    /// <param name="jsonData">The JSON string containing player position data.</param>
     public void UpdateTargetPosition(string jsonData)
     {
         if (gsiDataReceiver != null)
@@ -87,9 +122,15 @@ public class HeatMapPlayerMovement : MonoBehaviour
             position = ParseGSI(gsiDataReceiver.positionsData);
             Debug.Log("Updated player position: " + position);
         }
-        LeaveTrace(); // Leave trace after updating the position
+        LeaveTrace(); //Leave trace after updating the position
     }
 
+
+    /// <summary>
+    /// Parses the JSON data to extract the player's position.
+    /// </summary>
+    /// <param name="jsonData">The JSON string containing player data.</param>
+    /// <returns>The player's position as a Vector3.</returns>
     Vector3 ParseGSI(string jsonData)
     {
         JObject allPlayers = JObject.Parse(jsonData); // Parse JSON using Newtonsoft
@@ -116,7 +157,7 @@ public class HeatMapPlayerMovement : MonoBehaviour
                         float y_coord = float.Parse(coords[1], System.Globalization.CultureInfo.InvariantCulture);
                         float z_coord = float.Parse(coords[2], System.Globalization.CultureInfo.InvariantCulture);
 
-                        // Update the global position variable
+                        // Transform coordinates into Unity 
                         position = new Vector3(0.000215f * x_coord + 0.052f, 0.000217f * y_coord - 0.21f, 0f);
                         //Vector3 position = new Vector3(0.0006f * x_coord - 0.02f, 0.501f, 0.0006f * z_coord - 0.65f);
                         return position; // Return the updated position
@@ -127,6 +168,10 @@ public class HeatMapPlayerMovement : MonoBehaviour
         return position;
     }
 
+    /// <summary>
+    /// Handles player selection from button in UI.
+    /// </summary>
+    /// <param name="player">The selected player's name.</param>
     public void ButtonClicked(string player)
     {
         Debug.Log("Button clicked for player: " + player);

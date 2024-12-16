@@ -4,14 +4,23 @@ using TMPro;
 using UnityEngine;
 using Newtonsoft.Json.Linq;
 
+/// <summary>
+/// Handles the display and updating of match scores using GSI data reveiver.
+/// </summary>
 public class MatchScore : MonoBehaviour
 {
+    // The GSI data receiver for retrieving match data.
     public GSIDataReceiver gsiDataReceiver;
+
+    //Reference to the TextMeshPro component for displaying scores.
     public TMP_Text textMeshPro;
 
+    /// <summary>
+    /// Initializes the script, and subscribes to match data updates.
+    /// </summary>
     void Start()
     {
-        // Find the GSIDataReceiver instance
+        //Find the GSIDataReceiver instance
         gsiDataReceiver = FindObjectOfType<GSIDataReceiver>();
         if (gsiDataReceiver == null)
         {
@@ -19,20 +28,24 @@ public class MatchScore : MonoBehaviour
             return;
         }
 
-        // Ensure TextMeshPro is assigned
+        //Ensure TextMeshPro is assigned
         if (textMeshPro == null)
         {
             Debug.LogError("TextMeshPro not assigned.");
             return;
         }
 
-        // Subscribe to data updates
+        //Subscribe to data updates
         gsiDataReceiver.OnMatchDataReceived += StatisticsUpdate;
 
-        // Initialize text with existing data
+        //Initialize text with existing data
         StatisticsUpdate(gsiDataReceiver.statisticsData);
     }
 
+    /// <summary>
+    /// Updates the score display when match data is received.
+    /// </summary>
+    /// <param name="data">JSON string containing match statistics.</param>
     private void StatisticsUpdate(string data)
     {
         if (gsiDataReceiver != null) {
@@ -44,9 +57,11 @@ public class MatchScore : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Unsubscribes from GSI data updates when the script is destroyed.
+    /// </summary>
     private void OnDestroy()
     {
-        // Unsubscribe to avoid memory leaks
         if (gsiDataReceiver != null)
         {
             gsiDataReceiver.OnMatchDataReceived -= StatisticsUpdate;
