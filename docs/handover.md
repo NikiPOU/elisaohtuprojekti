@@ -15,7 +15,7 @@ https://gsi-ohtuprojekti-staging.apps.ocp-test-0.k8s.it.helsinki.fi/statistics
 When starting with Unity, [Unity Essentials](https://learn.unity.com/pathway/unity-essentials) is a good tutorial for the basics.
 
 There is a bug in Unity which makes the scene view appear red instead of the actual colours (at least on Linux). Here's how to fix that:
-1. Open Unity hu
+1. Open Unity hub
 2. Press the 3 dots on the specific project
 3. Select "Add command line arguments"
 4. Write down `-force-vulkan`
